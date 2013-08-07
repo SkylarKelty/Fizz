@@ -44,4 +44,12 @@ class FizzTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(is_array($demo->create()));
 	}
 
+	public function test_Update() {
+		$demo = new Demo();
+		$demo->key = "Test";
+		$demo->value = "Testing here!";
+		$this->assertTrue($demo->create());
+		$this->assertTrue($demo->update(array("value" => "Testing here! Look away!")));
+	}
+
 }

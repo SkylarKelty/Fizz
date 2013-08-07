@@ -72,9 +72,33 @@ abstract class Fizz
 	}
 
 	/**
-	 * Insert into the database
+	 * Update our record in the database
+	 *
+	 * @param array $new_data New data. Must be a multidimensional array(column=>value)
 	 */
 	public function update($new_data) {
+		$fields = $this->_fizz_fields();
+		$values = array();
+
+		// Add in the sets
+		$sets = array();
+		foreach ($new_data as $key => $value) {
+			$sets[] = "`" . mysql_escape_string($key) . "`=:" . $key;
+			$values[':' . $key] = $value;
+		}
+
+		// Find the wheres
+		$wheres = array();
+		foreach ($fields as $key) {
+			$wheres[] = "`" . mysql_escape_string($key) . "`=:FZCURRENT" . $key . " ";
+			$values[":FZCURRENT" . $key] = $this->$key;
+		}
+
+		// Prepare the query
+		$sql = "UPDATE `".$this->_fizz_table."` SET " . implode(",", $sets) . " WHERE " . implode(" AND ", $wheres);
+
+		$q = $this->_fizz_pdo->prepare($sql);
+		return $this->_fizz_execute($q, $values);
 	}
 
 	/**
