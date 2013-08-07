@@ -12,7 +12,6 @@ class Demo extends SkylarK\Fizz\Fizz
 		} else {
 			$this->test = '';
 		}
-		$this->_fizz_updateFields();
 	}
 }
 
