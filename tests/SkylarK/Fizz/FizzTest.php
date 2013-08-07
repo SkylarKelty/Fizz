@@ -31,7 +31,4 @@ class FizzTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(array("key", "value"), self::$_fizz->fields());
 	}
 
-	//public function test_Table_Install() {
-		//$this->assertTrue(self::$_fizz->install());
-	//}
 }

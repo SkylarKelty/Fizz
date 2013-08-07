@@ -8,4 +8,5 @@ services:
 before_script:
   - composer install
   - mysql -e 'create database testdb;'
+  - mysql -e 'CREATE TABLE IF NOT EXISTS `testdb`.`Demo` (`key` varchar(255) NOT NULL,`value` text NOT NULL, PRIMARY KEY (`key`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 script: vendor/bin/phpunit tests/
