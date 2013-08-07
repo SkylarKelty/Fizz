@@ -86,14 +86,14 @@ abstract class Fizz
 		// Add in the sets
 		$sets = array();
 		foreach ($new_data as $key => $value) {
-			$sets[] = "`" . mysql_real_escape_string($key) . "`=:" . $key;
+			$sets[] = "`" . $key . "`=:" . $key;
 			$values[':' . $key] = $value;
 		}
 
 		// Find the wheres
 		$wheres = array();
 		foreach ($fields as $key) {
-			$wheres[] = "`" . mysql_real_escape_string($key) . "`=:FZCURRENT" . $key . " ";
+			$wheres[] = "`" . $key . "`=:FZCURRENT" . $key . " ";
 			$values[":FZCURRENT" . $key] = $this->$key;
 		}
 
