@@ -18,11 +18,9 @@ class Demo extends SkylarK\Fizz\Fizz
 
 class FizzTest extends PHPUnit_Framework_TestCase
 {
-	private static $_fizz;
-
 	public static function setUpBeforeClass() {
 		try {
-			self::$_fizz = new Demo("mysql:dbname=testdb;host=127.0.0.1", "travis", "");
+			SkylarK\Fizz\FizzConfig::setDB("mysql:dbname=testdb;host=127.0.0.1", "travis", "");
 		}
 		catch (PDOException $e) {
 			die($e->getMessage());
@@ -30,18 +28,15 @@ class FizzTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
-	public static function tearDownAfterClass() {
-		self::$_fizz = NULL;
-	}
-
 	// Tests
 
 	public function test_Grab_Vars() {
-		$this->assertEquals(array("key", "value"), self::$_fizz->fields());
-		self::$_fizz->toggleVar();
-		$this->assertEquals(array("key", "value", "test"), self::$_fizz->fields());
-		self::$_fizz->toggleVar();
-		$this->assertEquals(array("key", "value"), self::$_fizz->fields());
+		$demo = new Demo();
+		$this->assertEquals(array("key", "value"), $demo->fields());
+		$demo->toggleVar();
+		$this->assertEquals(array("key", "value", "test"), $demo->fields());
+		$demo->toggleVar();
+		$this->assertEquals(array("key", "value"), $demo->fields());
 	}
 
 }

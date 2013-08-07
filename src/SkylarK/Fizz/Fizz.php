@@ -22,11 +22,15 @@ abstract class Fizz
 	/**
 	 * Initialize Fizz with valid database connection details
 	 * 
-	 * @param string $db_string A PDO connection string
+	 * @param string $db_dsn A PDO connection string
 	 * @param string $table The name of the table this model relates too
 	 */
-	public function __construct($db_dsn, $db_username = NULL, $db_password = NULL, $table = NULL) {
-		$this->_fizz_pdo = new \PDO($db_dsn, $db_username, $db_password);
+	public function __construct($table = NULL) {
+		$this->_fizz_pdo = FizzConfig::getDB();
+		if (!$this->_fizz_pdo) {
+			throw new Exception("Could not connect to Database");
+		}
+
 		$this->_fizz_table = empty($table) ? get_called_class() : $table;
 		$this->_fizz_updateFields();
 	}
@@ -49,4 +53,9 @@ abstract class Fizz
 	public function fields() {
 		return $this->_fizz_fields;
 	}
+
+	/**
+	 * Test an insert
+	 */
+	
 }
