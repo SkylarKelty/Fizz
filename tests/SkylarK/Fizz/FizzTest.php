@@ -38,4 +38,11 @@ class FizzTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(array("key", "value"), $demo->fields());
 	}
 
+	public function test_Create() {
+		$demo = new Demo();
+		$demo->key = "Test";
+		$demo->value = "Testing here!";
+		$demo->create();
+	}
+
 }

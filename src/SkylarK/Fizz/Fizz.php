@@ -50,5 +50,12 @@ abstract class Fizz
 	 */
 	public function create() {
 		$fields = $this->fields();
+		$sql = "INSERT INTO ".$this->_fizz_table." (".implode(",", $fields).") VALUES (:".implode(",:", $fields).")";
+		print $sql;
+		//$q = $conn->prepare($sql);
+		//$q->execute(array(':author'=>$author,
+		//                  ':title'=>$title));
+ 
+
 	}
 }
