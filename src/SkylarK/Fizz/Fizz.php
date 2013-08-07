@@ -30,7 +30,12 @@ abstract class Fizz
 		$this->_fizz_table = empty($table) ? get_called_class() : $table;
 
 		// Extract the fields
-		$this->_fizz_fields = get_object_vars($this);
+		$this->_fizz_fields = array();
+		foreach (get_object_vars($this) as $key => $val) {
+			if (is_string($key) && strpos($key, "_") !== 0) {
+				$this->_fizz_fields[] = $key;
+			}
+		}
 	}
 
 	/**

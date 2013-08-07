@@ -27,7 +27,7 @@ class FizzTest extends PHPUnit_Framework_TestCase
 	// Tests
 
 	public function test_Grab_Vars() {
-		$this->assertEqual(array("key", "value"), self::$_fizz->fields());
+		$this->assertEquals(array("key", "value"), self::$_fizz->fields());
 	}
 
 	//public function test_Table_Install() {
