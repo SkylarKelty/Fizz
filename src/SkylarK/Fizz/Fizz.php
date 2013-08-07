@@ -124,6 +124,13 @@ abstract class Fizz
 	}
 
 	/**
+	 * Returns an array of all results that match the specified conditions
+	 */
+	public static function find($search) {
+		// TODO
+	}
+
+	/**
 	 * Truncate the table
 	 * Use with caution!
 	 */
