@@ -118,6 +118,9 @@ abstract class Fizz
 	 */
 	public static function all() {
 		$pdo = FizzConfig::getDB();
+		$sql = "SELECT * FROM " . self::tablename();
+		$result = $pdo->query($sql);
+		return $result->fetchAll(\PDO::FETCH_CLASS, get_called_class());
 	}
 
 	/**
