@@ -58,6 +58,9 @@ abstract class Fizz
 
 		$sql = "INSERT INTO `".$this->_fizz_table."` (`".implode("`,`", $fields)."`) VALUES (:".implode(",:", $fields).")";
 		$q = $this->_fizz_pdo->prepare($sql);
-		return $q->execute($values);
+		if ($q->execute($values)) {
+			return true;
+		}
+		return $q->errorInfo();
 	}
 }
