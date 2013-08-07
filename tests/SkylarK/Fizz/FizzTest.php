@@ -5,6 +5,15 @@ class Demo extends SkylarK\Fizz\Fizz
 	public $_ignore_me;
 	public $key;
 	public $value;
+
+	public function toggleVar() {
+		if (isset($this->test)) {
+			unset($this->test);
+		} else {
+			$this->test = '';
+		}
+		$this->_fizz_updateFields();
+	}
 }
 
 class FizzTest extends PHPUnit_Framework_TestCase
@@ -28,6 +37,10 @@ class FizzTest extends PHPUnit_Framework_TestCase
 	// Tests
 
 	public function test_Grab_Vars() {
+		$this->assertEquals(array("key", "value"), self::$_fizz->fields());
+		self::$_fizz->toggleVar();
+		$this->assertEquals(array("key", "value", "test"), self::$_fizz->fields());
+		self::$_fizz->toggleVar();
 		$this->assertEquals(array("key", "value"), self::$_fizz->fields());
 	}
 
