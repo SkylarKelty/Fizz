@@ -35,7 +35,7 @@ abstract class Fizz
 	/**
 	 * Shortcut for our common PDO execution method
 	 */
-	private function _fizz_execute($query, $values) {
+	protected function _fizz_execute($query, $values) {
 		if ($query->execute($values)) {
 			return true;
 		}
@@ -45,7 +45,7 @@ abstract class Fizz
 	/**
 	 * Return a list of fields we know about.
 	 */
-	public function fields() {
+	public function _fizz_fields() {
 		$fields = array();
 		foreach (get_object_vars($this) as $key => $val) {
 			if (is_string($key) && strpos($key, "_") !== 0) {
@@ -59,7 +59,7 @@ abstract class Fizz
 	 * Insert into the database
 	 */
 	public function create() {
-		$fields = $this->fields();
+		$fields = $this->_fizz_fields();
 
 		$values = array();
 		foreach ($fields as $field) {
@@ -69,6 +69,12 @@ abstract class Fizz
 		$sql = "INSERT INTO `".$this->_fizz_table."` (`".implode("`,`", $fields)."`) VALUES (:".implode(",:", $fields).")";
 		$q = $this->_fizz_pdo->prepare($sql);
 		return $this->_fizz_execute($q, $values);
+	}
+
+	/**
+	 * Insert into the database
+	 */
+	public function update($new_data) {
 	}
 
 	/**

@@ -28,11 +28,11 @@ class FizzTest extends PHPUnit_Framework_TestCase
 
 	public function test_Grab_Vars() {
 		$demo = new Demo();
-		$this->assertEquals(array("key", "value"), $demo->fields());
+		$this->assertEquals(array("key", "value"), $demo->_fizz_fields());
 		$demo->test = "";
-		$this->assertEquals(array("key", "value", "test"), $demo->fields());
+		$this->assertEquals(array("key", "value", "test"), $demo->_fizz_fields());
 		unset($demo->test);
-		$this->assertEquals(array("key", "value"), $demo->fields());
+		$this->assertEquals(array("key", "value"), $demo->_fizz_fields());
 	}
 
 	public function test_Create() {
