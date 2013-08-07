@@ -98,7 +98,16 @@ abstract class Fizz
 		$sql = "UPDATE `".$this->_fizz_table."` SET " . implode(",", $sets) . " WHERE " . implode(" AND ", $wheres);
 
 		$q = $this->_fizz_pdo->prepare($sql);
-		return $this->_fizz_execute($q, $values);
+		$result = $this->_fizz_execute($q, $values);
+
+		// Update class vars if we updated DB
+		if ($result === true) {
+			foreach ($new_data as $key => $value) {
+				$this->$key = $value;
+			}
+		}
+
+		return $result;
 	}
 
 	/**
