@@ -35,7 +35,7 @@ abstract class Fizz
 	/**
 	 * Shortcut for our common PDO execution method
 	 */
-	protected function _fizz_execute($query, $values) {
+	private function _fizz_execute($query, $values) {
 		if ($query->execute($values)) {
 			return true;
 		}
