@@ -1,0 +1,27 @@
+{
+   "name": "skylarkelty/fizz",
+   "description": "A lightweight ORM.",
+   "type": "library",
+   "keywords": [
+      "orm",
+      "database"
+   ],
+   "homepage": "https://github.com/SkylarKelty/Fizz",
+   "license": "Apache License v2.0",
+   "authors": [{
+      "name": "Skylar Tristan Kelty",
+      "email": "skylarkelty@gmail.com",
+      "role": "lead"
+   }],
+   "require": {
+      "php": ">=5.3"
+   },
+   "require-dev": {
+      "phpunit/phpunit": "3.7.*"
+   },
+   "autoload": {
+      "psr-0": {
+         "Fizz": ["src/"]
+      }
+   }
+}
