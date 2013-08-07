@@ -33,6 +33,16 @@ abstract class Fizz
 	}
 
 	/**
+	 * Shortcut for our common PDO execution method
+	 */
+	private function _fizz_execute($query, $values) {
+		if ($query->execute($values)) {
+			return true;
+		}
+		return $query->errorInfo();
+	}
+
+	/**
 	 * Return a list of fields we know about.
 	 */
 	public function fields() {
@@ -58,9 +68,16 @@ abstract class Fizz
 
 		$sql = "INSERT INTO `".$this->_fizz_table."` (`".implode("`,`", $fields)."`) VALUES (:".implode(",:", $fields).")";
 		$q = $this->_fizz_pdo->prepare($sql);
-		if ($q->execute($values)) {
-			return true;
-		}
-		return $q->errorInfo();
+		return $this->_fizz_execute($q, $values);
+	}
+
+	/**
+	 * Truncate the table
+	 * Use with caution!
+	 */
+	public function truncate() {
+		$sql = "TRUNCATE `" . $this->_fizz_table . "`";
+		$q = $this->_fizz_pdo->prepare($sql);
+		return $this->_fizz_execute($q, array());
 	}
 }

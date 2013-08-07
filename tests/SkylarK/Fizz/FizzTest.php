@@ -6,12 +6,9 @@ class Demo extends SkylarK\Fizz\Fizz
 	public $key;
 	public $value;
 
-	public function toggleVar() {
-		if (isset($this->test)) {
-			unset($this->test);
-		} else {
-			$this->test = '';
-		}
+	public function __construct($table = NULL) {
+		parent::__construct($table);
+		$this->truncate();
 	}
 }
 
@@ -32,9 +29,9 @@ class FizzTest extends PHPUnit_Framework_TestCase
 	public function test_Grab_Vars() {
 		$demo = new Demo();
 		$this->assertEquals(array("key", "value"), $demo->fields());
-		$demo->toggleVar();
+		$demo->test = "";
 		$this->assertEquals(array("key", "value", "test"), $demo->fields());
-		$demo->toggleVar();
+		unset($demo->test);
 		$this->assertEquals(array("key", "value"), $demo->fields());
 	}
 
@@ -43,6 +40,8 @@ class FizzTest extends PHPUnit_Framework_TestCase
 		$demo->key = "Test";
 		$demo->value = "Testing here!";
 		$this->assertTrue($demo->create());
+		$demo->shouldnt_be_here = "Test";
+		$this->assertTrue(is_array($demo->create()));
 	}
 
 }
