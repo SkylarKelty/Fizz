@@ -28,7 +28,7 @@ abstract class Fizz
 	public function __construct($table = NULL) {
 		$this->_fizz_pdo = FizzConfig::getDB();
 		if (!$this->_fizz_pdo) {
-			throw new Exception("Could not connect to Database");
+			throw new Exceptions\FizzDatabaseConnectionException("Could not connect to Database");
 		}
 
 		$this->_fizz_table = empty($table) ? get_called_class() : $table;
