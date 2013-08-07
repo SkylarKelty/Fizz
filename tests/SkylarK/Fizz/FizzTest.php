@@ -2,6 +2,7 @@
 
 class Demo extends SkylarK\Fizz\Fizz
 {
+	public $_ignore_me;
 	public $key;
 	public $value;
 }

@@ -28,8 +28,13 @@ abstract class Fizz
 	public function __construct($db_dsn, $db_username = NULL, $db_password = NULL, $table = NULL) {
 		$this->_fizz_pdo = new \PDO($db_dsn, $db_username, $db_password);
 		$this->_fizz_table = empty($table) ? get_called_class() : $table;
+		$this->_fizz_updateFields();
+	}
 
-		// Extract the fields
+	/**
+	 * Update our list of fields
+	 */
+	protected function _fizz_updateFields() {
 		$this->_fizz_fields = array();
 		foreach (get_object_vars($this) as $key => $val) {
 			if (is_string($key) && strpos($key, "_") !== 0) {
