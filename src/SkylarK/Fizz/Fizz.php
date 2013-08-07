@@ -14,8 +14,6 @@ abstract class Fizz
 {
 	/** Our PDO instance */
 	private $_fizz_pdo;
-	/** The name of the table we use */
-	private $_fizz_table;
 
 	/**
 	 * Initialize Fizz with valid database connection details
@@ -28,8 +26,13 @@ abstract class Fizz
 		if (!$this->_fizz_pdo) {
 			throw new Exceptions\FizzDatabaseConnectionException("Could not connect to Database");
 		}
+	}
 
-		$this->_fizz_table = empty($table) ? get_called_class() : $table;
+	/**
+	 * Returns the table name
+	 */
+	public static function tablename() {
+		return get_called_class();
 	}
 
 	/**
@@ -66,7 +69,7 @@ abstract class Fizz
 			$values[":" . $field] = $this->$field;
 		}
 
-		$sql = "INSERT INTO `".$this->_fizz_table."` (`".implode("`,`", $fields)."`) VALUES (:".implode(",:", $fields).")";
+		$sql = "INSERT INTO `".self::tablename()."` (`".implode("`,`", $fields)."`) VALUES (:".implode(",:", $fields).")";
 		$q = $this->_fizz_pdo->prepare($sql);
 		return $this->_fizz_execute($q, $values);
 	}
@@ -95,7 +98,7 @@ abstract class Fizz
 		}
 
 		// Prepare the query
-		$sql = "UPDATE `".$this->_fizz_table."` SET " . implode(",", $sets) . " WHERE " . implode(" AND ", $wheres);
+		$sql = "UPDATE `".self::tablename()."` SET " . implode(",", $sets) . " WHERE " . implode(" AND ", $wheres);
 
 		$q = $this->_fizz_pdo->prepare($sql);
 		$result = $this->_fizz_execute($q, $values);
@@ -114,7 +117,7 @@ abstract class Fizz
 	 * Returns an array of all results
 	 */
 	public static function all() {
-
+		$pdo = FizzConfig::getDB();
 	}
 
 	/**
@@ -122,7 +125,7 @@ abstract class Fizz
 	 * Use with caution!
 	 */
 	public function truncate() {
-		$sql = "TRUNCATE `" . $this->_fizz_table . "`";
+		$sql = "TRUNCATE `" . self::tablename() . "`";
 		$q = $this->_fizz_pdo->prepare($sql);
 		return $this->_fizz_execute($q, array());
 	}
