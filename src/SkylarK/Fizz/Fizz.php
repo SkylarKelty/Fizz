@@ -127,7 +127,24 @@ abstract class Fizz
 	 * Returns an array of all results that match the specified conditions
 	 */
 	public static function find($search) {
-		// TODO
+		$pdo = FizzConfig::getDB();
+
+		// Find the wheres
+		$values = array();
+		$wheres = array();
+		foreach ($search as $key => $value) {
+			$wheres[] = "`" . $key . "`=:" . $key . " ";
+			$values[":" . $key] = $value;
+		}
+
+		$sql = "SELECT * FROM " . self::tablename() . " WHERE " . implode(" AND ", $wheres);
+
+		$q = $pdo->prepare($sql);
+		if (!$q->execute($values)) {
+			return false;
+		}
+
+		return $q->fetchAll(\PDO::FETCH_CLASS, get_called_class());
 	}
 
 	/**

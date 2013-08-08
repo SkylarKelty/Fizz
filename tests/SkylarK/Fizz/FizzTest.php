@@ -75,4 +75,19 @@ class FizzTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($objs[1]->value, "Testing here!");
 	}
 
+	public function test_Find() {
+		$demo = new Demo();
+		$demo->key = "Test";
+		$demo->value = "Testing here!";
+		$this->assertTrue($demo->create());
+		$demo->key = "Test2";
+		$this->assertTrue($demo->create());
+
+		$objs = Demo::find(array("key" => "Test2"));
+		$this->assertTrue(isset($objs[0]));
+		$this->assertFalse(isset($objs[1]));
+		$this->assertEquals($objs[0]->key, "Test2");
+		$this->assertEquals($objs[0]->value, "Testing here!");
+	}
+
 }
