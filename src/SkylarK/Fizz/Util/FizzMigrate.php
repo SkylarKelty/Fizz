@@ -16,6 +16,8 @@ class FizzMigrate
 	private $_table;
 	/** Track our version */
 	private $_version;
+	/** Track our fields */
+	private $_fields;
 
 	/**
 	 * Construct a new migrations object.
@@ -24,18 +26,19 @@ class FizzMigrate
 	 *
 	 * // First, create the start object
 	 * $object = new FizzMigrate("MetaData");
-	 * $object->addField("key", "varchar", 250, true, true);
-	 * $object->addField("value", "varchar", 250, true, false);
+	 * $object->addField("key", "varchar(255)");
+	 * $object->addField("value", "varchar(255)");
+	 * $object->setPrimary("key", true);
+	 * $object->setUnique("value", true);
 	 *
 	 * // Then list your changes
 	 * $object->beginMigration();
-	 * $object->retype("value", "text");
-	 * $object->resize("value", NULL);
+	 * $object->setUnique("value", false);
 	 * $object->endMigration();
 	 *
 	 * // More changes later
 	 * $object->beginMigration();
-	 * $object->removePrimaryKey("value");
+	 * $object->retype("value", "text");
 	 * $object->endMigration();
 	 * 
 	 * @param string $tableName The name of the table we relate too
@@ -44,6 +47,7 @@ class FizzMigrate
 	public function __construct($tableName) {
 		$this->_table = $tableName;
 		$this->_version = 0;
+		$this->_fields = array();
 	}
 
 	/**
@@ -59,4 +63,36 @@ class FizzMigrate
 	public function beginMigration() {
 		// -
 	}
+
+	/**
+	 * Add a new field to this model
+	 * 
+	 * @param string $name The name of the field
+	 * @param string $type SQL Type
+	 */
+	public function addField($name, $type) {
+		$this->_fields[$name] = array("type" => $type);
+	}
+
+	/**
+	 * Turn a field into a primary key, or remove one
+	 * 
+	 * @param string  $name  The name of the field
+	 * @param boolean $value True if this field should be a primary key, false if not
+	 */
+	public function setPrimary($name, $value = true) {
+		// ALTER TABLE Demo DROP PRIMARY KEY
+		// if ($value) {
+		// 	ALTER TABLE  `Demo` ADD PRIMARY KEY (  `key` )
+		// }
+	}
 }
+
+/**
+ * Queries to refer too:
+ * `ALTER TABLE Demo DROP PRIMARY KEY`
+ * ALTER TABLE  `Demo` ADD PRIMARY KEY (  `key` )
+ * ALTER TABLE  `Demo` ADD INDEX (  `value` ) ;
+ * `ALTER TABLE Demo DROP INDEX key`
+ * ALTER TABLE  `Demo` ADD UNIQUE (`key`)
+ */
