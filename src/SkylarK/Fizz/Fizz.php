@@ -137,14 +137,23 @@ abstract class Fizz
 			$values[":" . $key] = $value;
 		}
 
+		// Build the query
 		$sql = "SELECT * FROM " . self::tablename() . " WHERE " . implode(" AND ", $wheres);
 
+		// Execute the statement
 		$q = $pdo->prepare($sql);
 		if (!$q->execute($values)) {
 			return false;
 		}
 
 		return $q->fetchAll(\PDO::FETCH_CLASS, get_called_class());
+	}
+
+	/**
+	 * Run a custom query
+	 */
+	public static function pdo() {
+		return FizzConfig::getDB();
 	}
 
 	/**
