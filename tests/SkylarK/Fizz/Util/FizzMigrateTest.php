@@ -61,11 +61,11 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$fields = $object->getActualFields();
 		$this->assertTrue(is_array($fields));
 		$this->assertTrue(isset($fields[0]));
-		$this->assertEquals($fields[0]['name'], "key");
-		$this->assertEquals($fields[0]['len'], 11);
 		$this->assertTrue(isset($fields[1]));
-		$this->assertEquals($fields[1]['name'], "value");
-		$this->assertEquals($fields[1]['len'], 125);
+		$this->assertEquals("key", $fields[0]['name']);
+		$this->assertEquals("value", $fields[1]['name']);
+		$this->assertEquals(11, $fields[0]['len']);
+		$this->assertEquals(125, $fields[1]['len']);
 
 		$object->beginMigration();
 		$object->addField("another_value", "varchar(225)");
@@ -75,14 +75,14 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$fields = $object->getActualFields();
 		$this->assertTrue(is_array($fields));
 		$this->assertTrue(isset($fields[0]));
-		$this->assertEquals($fields[0]['name'], "key");
-		$this->assertEquals($fields[0]['len'], 11);
 		$this->assertTrue(isset($fields[1]));
-		$this->assertEquals($fields[1]['name'], "value");
-		$this->assertEquals($fields[1]['len'], 125);
 		$this->assertTrue(isset($fields[2]));
-		$this->assertEquals($fields[2]['name'], "another_value");
-		$this->assertEquals($fields[2]['len'], 225);
+		$this->assertEquals("key", $fields[0]['name']);
+		$this->assertEquals("value", $fields[1]['name']);
+		$this->assertEquals("another_value", $fields[2]['name']);
+		$this->assertEquals(11, $fields[0]['len']);
+		$this->assertEquals(125, $fields[1]['len']);
+		$this->assertEquals(225, $fields[2]['len']);
 	}
 
 	public function test_RemoveField() {
@@ -95,9 +95,9 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$fields = $object->getActualFields();
 		$this->assertTrue(is_array($fields));
 		$this->assertTrue(isset($fields[0]));
-		$this->assertEquals($fields[0]['name'], "key");
 		$this->assertTrue(isset($fields[1]));
-		$this->assertEquals($fields[1]['name'], "value");
+		$this->assertEquals("key", $fields[0]['name']);
+		$this->assertEquals("value", $fields[1]['name']);
 
 		$object->beginMigration();
 		$object->removeField("value");
@@ -107,8 +107,8 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$fields = $object->getActualFields();
 		$this->assertTrue(is_array($fields));
 		$this->assertTrue(isset($fields[0]));
-		$this->assertEquals($fields[0]['name'],"key");
 		$this->assertTrue(!isset($fields[1]));
+		$this->assertEquals("key", $fields[0]['name']);
 	}
 
 	// -----------------------------------------------------------------------------------------
