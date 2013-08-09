@@ -184,6 +184,20 @@ class FizzMigrate
 	}
 
 	/**
+	 * Rename a field from this model
+	 * 
+	 * @param string $name The name of the field
+	 * @param string $new_name The new name of the field
+	 */
+	public function renameField($name, $newName) {
+		$this->_fields[$newName] = $this->_fields[$name];
+		unset($this->_fields[$name]);
+		if ($this->_version > 0) {
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` CHANGE `" . $name . "` " . $this->_getFieldSQL($newName, $this->_fields[$newName]);
+		}
+	}
+
+	/**
 	 * Turn a field into a primary key, or remove one
 	 * 
 	 * @param string  $name  The name of the field
