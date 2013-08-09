@@ -106,6 +106,9 @@ class FizzMigrate
 	 */
 	public function addField($name, $type, $null = false) {
 		$this->_fields[$name] = array("type" => $type, "null" => $null);
+		if ($this->_version > 0) {
+			//$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD `" . $name . "` INT(12) NOT NULL)";
+		}
 	}
 
 	/**
@@ -183,13 +186,6 @@ class FizzMigrate
 	}
 
 	/**
-	 * Does this table exist?
-	 */
-	protected function exists() {
-		return $this->_pdo->exec("SELECT 1 FROM `" . $this->_table . "`") !== false;
-	}
-
-	/**
 	 * Create the table, internal use only
 	 */
 	protected function create() {
@@ -215,11 +211,40 @@ class FizzMigrate
 	}
 
 	// -----------------------------------------------------------------------------------------
+	// Helpers
+	// -----------------------------------------------------------------------------------------
+
+	/**
+	 * Does this table exist?
+	 */
+	protected function exists() {
+		return $this->_pdo->exec("SELECT 1 FROM `" . $this->_table . "`") !== false;
+	}
+	
+	/**
+	 * Returns a list of fields currently in the database
+	 */
+	public function getActualFields() {
+		$statement = $this->_pdo->query("SELECT * FROM `" . $this->_table . "` LIMIT 1");
+
+		$columns = array();
+		// Grab column meta
+		$column_count = $statement->columnCount();
+		for ($i = 0; $i < $column_count; $i++) {
+			$columns[] = $statement->getColumnMeta($i);
+		}
+
+		$result = $statement->fetchAll(); // Clear out
+
+		return $columns;
+	}
+
+	// -----------------------------------------------------------------------------------------
 	// Table Operations
 	// -----------------------------------------------------------------------------------------
 	
 	/**
-	 * Helper
+	 * Operation Helper
 	 */
 	protected function _operation($sql) {
 		if ($this->_pdo->exec($sql) === false) {

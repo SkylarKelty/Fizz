@@ -41,7 +41,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($object->commit());
 	}
 
-	public function test_Transaction() {
+	public function test_SimpleTransaction() {
 		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
 		$object->addField("key", "int(11)");
 		$object->addField("value", "varchar(125)");
@@ -50,6 +50,45 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->setPrimary("key", true);
 		$this->assertTrue($object->endMigration());
 	}
+
+	public function test_AddField() {
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$object->addField("value", "varchar(125)");
+		$this->assertTrue($object->commit());
+
+		// Check fields
+		$fields = $object->getActualFields();
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertTrue($fields[0]['name'] == "key");
+		$this->assertTrue($fields[0]['len'] == 11);
+		$this->assertTrue(isset($fields[1]));
+		$this->assertTrue($fields[1]['name'] == "value");
+		$this->assertTrue($fields[1]['len'] == 125);
+
+		$object->beginMigration();
+		$object->addField("another_value", "varchar(225)");
+		$this->assertTrue($object->endMigration());
+
+		// Check fields
+		$fields = $object->getActualFields();
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertTrue($fields[0]['name'] == "key");
+		$this->assertTrue($fields[0]['len'] == 11);
+		$this->assertTrue(isset($fields[1]));
+		$this->assertTrue($fields[1]['name'] == "value");
+		$this->assertTrue($fields[1]['len'] == 125);
+		$this->assertTrue(isset($fields[2]));
+		$this->assertTrue($fields[2]['name'] == "another_value");
+		$this->assertTrue($fields[2]['len'] == 225);
+
+	}
+
+	// -----------------------------------------------------------------------------------------
+	// Operation Tests
+	// -----------------------------------------------------------------------------------------
 
 	public function test_Truncate() {
 		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
