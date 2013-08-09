@@ -102,6 +102,13 @@ class FizzMigrate
 	public function truncate() {
 		return $this->_pdo->exec("TRUNCATE TABLE `" . $this->_table . "`");
 	}
+
+	/**
+	 * Drop the table
+	 */
+	public function drop() {
+		return $this->_pdo->exec("DROP TABLE `" . $this->_table . "`");
+	}
 }
 
 /**
