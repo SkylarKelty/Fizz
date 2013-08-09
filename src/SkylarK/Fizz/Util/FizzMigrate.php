@@ -18,6 +18,8 @@ class FizzMigrate
 	private $_version;
 	/** Track our fields */
 	private $_fields;
+	/** Our PDO instance */
+	private $_pdo;
 
 	/**
 	 * Construct a new migrations object.
@@ -40,6 +42,9 @@ class FizzMigrate
 	 * $object->beginMigration();
 	 * $object->retype("value", "text");
 	 * $object->endMigration();
+	 *
+	 * // Commit changes to DB
+	 * $object->commit();
 	 * 
 	 * @param string $tableName The name of the table we relate too
 	 * @param string $schemaVersion The version of the schema we are working on. Important for upgrades
@@ -48,6 +53,10 @@ class FizzMigrate
 		$this->_table = $tableName;
 		$this->_version = 0;
 		$this->_fields = array();
+		$this->_pdo = FizzConfig::getDB();
+		if (!$this->_pdo) {
+			throw new Exceptions\FizzDatabaseConnectionException("Could not connect to Database");
+		}
 	}
 
 	/**
@@ -60,7 +69,7 @@ class FizzMigrate
 	/**
 	 * End a set of migrations
 	 */
-	public function beginMigration() {
+	public function endMigration() {
 		// -
 	}
 
@@ -85,6 +94,13 @@ class FizzMigrate
 		// if ($value) {
 		// 	ALTER TABLE  `Demo` ADD PRIMARY KEY (  `key` )
 		// }
+	}
+
+	/**
+	 * Truncate the table
+	 */
+	public function truncate() {
+		return $this->_pdo->exec("TRUNCATE TABLE `" . $this->_table . "`");
 	}
 }
 
