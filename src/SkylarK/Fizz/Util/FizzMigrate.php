@@ -20,6 +20,8 @@ class FizzMigrate
 	private $_fields;
 	/** Our PDO instance */
 	private $_pdo;
+	/** Our error stack */
+	private $_errors;
 
 	/**
 	 * Construct a new migrations object.
@@ -51,19 +53,29 @@ class FizzMigrate
 	 */
 	public function __construct($tableName) {
 		$this->_table = $tableName;
-		$this->_version = 1;
+		$this->_version = 0;
 		$this->_fields = array();
+		$this->_errors = array();
 		$this->_pdo = \SkylarK\Fizz\FizzConfig::getDB();
 		if (!$this->_pdo) {
 			throw new Exceptions\FizzDatabaseConnectionException("Could not connect to Database");
 		}
-		$this->exists();
+	}
+
+	/**
+	 * Returns any errors
+	 */
+	public function getErrors() {
+		return $this->_errors;
 	}
 
 	/**
 	 * Begin a new set of migrations
 	 */
 	public function beginMigration() {
+		if ($this->_version == 0) {
+			$this->commit();
+		}
 		$this->_version++;
 	}
 
@@ -79,16 +91,41 @@ class FizzMigrate
 	 * 
 	 * @param string $name The name of the field
 	 * @param string $type SQL Type
+	 * @param boolean $null Can this column be null? (Default: no)
 	 */
-	public function addField($name, $type) {
-		$this->_fields[$name] = array("type" => $type);
+	public function addField($name, $type, $null = false) {
+		$this->_fields[$name] = array("type" => $type, "null" => $null);
 	}
 
 	/**
 	 * Commit chanegs to DB
 	 */
 	public function commit() {
+		// If we are at version 0, increment version to alert beginMigration(...) to the fact
+		// we have committed the initial schema.
+		if ($this->_version == 0) {
+			$this->_version++;
+		}
+
+		// Bail out if we have no fields
+		if (count($this->_fields) === 0) {
+			$this->_errors[] = "No fields set whilst trying to commit";
+			return false;
+		}
+
+		// Create the table if it doesnt exist yet
+		if (!$this->exists()) {
+			// Create the table
+			if ($this->create() === false) {
+				$error = $this->_pdo->errorInfo();
+				$this->_errors[] = "Failed to create database! Reason given: " . $error[2];
+				return false;
+			}
+		}
+
+		// Set the table comment
 		$this->comment($this->_version);
+
 		return true;
 	}
 
@@ -123,13 +160,31 @@ class FizzMigrate
 	 * Does this table exist?
 	 */
 	protected function exists() {
-		die($this->_pdo->exec("SELECT 1 FROM test"));
+		return $this->_pdo->exec("SELECT 1 FROM `" . $this->_table . "`") !== false;
+	}
+
+	/**
+	 * Create the table, internal use only
+	 */
+	protected function create() {
+		$sql = "CREATE TABLE IF NOT EXISTS `" . $this->_table . "` (";
+
+		// Build fields
+		$fields = array();
+		foreach ($this->_fields as $name => $data) {
+			$fields[] = "`" . $name . "` " . $data['type'] . " " . ($data['null'] ? "DEFAULT NULL" : "NOT NULL");
+		}
+
+		$sql .= implode(",", $fields);
+		$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+		return $this->_pdo->exec($sql);
 	}
 
 	/**
 	 * Comment a table, internal use only
 	 */
-	private function comment($comment) {
+	protected function comment($comment) {
 		return $this->_pdo->exec("ALTER TABLE `" . $this->_table . "` COMMENT = '" . $comment . "'");
 	}
 }
