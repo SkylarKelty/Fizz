@@ -1,7 +1,9 @@
 <?php
 class FizzMigrateTest extends PHPUnit_Framework_TestCase
 {
-	public static function setUpBeforeClass() {
+	public function setUp() {
+		// Although it seems horribly inefficient, it ensures each test is clean
+		// and fresh. It's for tests, so accuracy > efficiency
 		try {
 			SkylarK\Fizz\FizzConfig::setDB("mysql:dbname=testdb;host=127.0.0.1", "travis", "");
 		}
@@ -9,9 +11,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 			die($e->getMessage());
 			exit(0);
 		}
-	}
 
-	public function setUp() {
 		// Drop each test
 		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
 		$object->drop();
@@ -32,5 +32,26 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->addField("value", "varchar(125)");
 		$object->setPrimary("key", true);
 		$this->assertTrue($object->commit());
+	}
+
+	public function test_Truncate() {
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$this->assertTrue($object->commit());
+		$this->assertTrue($object->truncate());
+	}
+
+	public function test_Optimize() {
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$this->assertTrue($object->commit());
+		$this->assertTrue($object->optimize());
+	}
+
+	public function test_Flush() {
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$this->assertTrue($object->commit());
+		$this->assertTrue($object->truncate());
 	}
 }

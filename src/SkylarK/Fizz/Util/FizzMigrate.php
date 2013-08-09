@@ -143,30 +143,6 @@ class FizzMigrate
 	}
 
 	/**
-	 * Truncate the table
-	 */
-	public function truncate() {
-		if ($this->_pdo->exec("TRUNCATE TABLE `" . $this->_table . "`") === false) {
-			$error = $this->_pdo->errorInfo();
-			$this->_errors[] = "Failed to truncate database! Reason given: " . $error[2];
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Drop the table
-	 */
-	public function drop() {
-		if ($this->_pdo->exec("DROP TABLE `" . $this->_table . "`") === false) {
-			$error = $this->_pdo->errorInfo();
-			$this->_errors[] = "Failed to drop database! Reason given: " . $error[2];
-			return false;
-		}
-		return true;
-	}
-
-	/**
 	 * Does this table exist?
 	 */
 	protected function exists() {
@@ -196,6 +172,50 @@ class FizzMigrate
 	 */
 	protected function comment($comment) {
 		return $this->_pdo->exec("ALTER TABLE `" . $this->_table . "` COMMENT = '" . $comment . "'");
+	}
+
+	// -----------------------------------------------------------------------------------------
+	// Table Operations
+	// -----------------------------------------------------------------------------------------
+	
+	/**
+	 * Helper
+	 */
+	protected function _operation($sql) {
+		if ($this->_pdo->exec($sql) === false) {
+			$error = $this->_pdo->errorInfo();
+			$this->_errors[] = "Failed to truncate database! Reason given: " . $error[2];
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Truncate the table
+	 */
+	public function truncate() {
+		return $this->_operation("TRUNCATE TABLE `" . $this->_table . "`");
+	}
+
+	/**
+	 * Drop the table
+	 */
+	public function drop() {
+		return $this->_operation("DROP TABLE `" . $this->_table . "`");
+	}
+
+	/**
+	 * Optimize the table
+	 */
+	public function optimize() {
+		return $this->_operation("OPTIMIZE TABLE `" . $this->_table . "`");
+	}
+
+	/**
+	 * Flush the table
+	 */
+	public function flush() {
+		return $this->_operation("FLUSH TABLE `" . $this->_table . "`");
 	}
 }
 
