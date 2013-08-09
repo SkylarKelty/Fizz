@@ -31,8 +31,24 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->addField("key", "int(11)");
 		$object->addField("value", "varchar(125)");
 		$this->assertTrue($object->commit());
+	}
+
+	public function test_PrimaryKeyCommit() {
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$object->addField("value", "varchar(125)");
 		$object->setPrimary("key", true);
 		$this->assertTrue($object->commit());
+	}
+
+	public function test_Transaction() {
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$object->addField("value", "varchar(125)");
+		$this->assertTrue($object->commit());
+		$object->beginMigration();
+		$object->setPrimary("key", true);
+		$this->assertTrue($object->endMigration());
 	}
 
 	public function test_Truncate() {

@@ -85,13 +85,16 @@ class FizzMigrate
 	}
 
 	/**
-	 * End a set of migrations
+	 * End a set of migrations.
+	 * @return boolean True if we committed any actions, or had nothing to do. False if there was an error.
 	 */
 	public function endMigration() {
+		$result = true;
 		if ($this->_version > $this->_table_version) {
-			$this->commit();
+			$result = $this->commit();
 		}
 		$this->_operations = array();
+		return $result;
 	}
 
 	/**
