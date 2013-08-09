@@ -111,7 +111,7 @@ class FizzMigrate
 		// we have committed the initial schema.
 		if ($this->_version == 0) {
 			// Also check if the table exists
-			if (!$this->exists()) {
+			if (!$this->_exists()) {
 				// Create the table
 				if ($this->create() === false) {
 					$error = $this->_pdo->errorInfo();
@@ -167,7 +167,7 @@ class FizzMigrate
 	public function addField($name, $type, $null = false) {
 		$this->_fields[$name] = array("type" => $type, "null" => $null);
 		if ($this->_version > 0) {
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD `" . $name . "` INT(12) NOT NULL)";
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD `" . $name . "` " . $type . " NOT NULL)";
 		}
 	}
 
@@ -194,7 +194,7 @@ class FizzMigrate
 		// Build fields
 		$fields = array();
 		foreach ($this->_fields as $name => $data) {
-			$fields[] = "`" . $name . "` " . $data['type'] . " " . ($data['null'] ? "DEFAULT NULL" : "NOT NULL");
+			$fields[] = $this->_getFieldSQL($name, $data);
 		}
 
 		$sql .= implode(",", $fields);
@@ -217,8 +217,15 @@ class FizzMigrate
 	/**
 	 * Does this table exist?
 	 */
-	protected function exists() {
+	protected function _exists() {
 		return $this->_pdo->exec("SELECT 1 FROM `" . $this->_table . "`") !== false;
+	}
+
+	/**
+	 * Returns SQL for a given field
+	 */
+	protected function _getFieldSQL($name, $data) {
+		return "`" . $name . "` " . $data['type'] . " " . ($data['null'] ? "DEFAULT NULL" : "NOT NULL");
 	}
 	
 	/**
