@@ -109,6 +109,13 @@ class FizzMigrate
 	public function drop() {
 		return $this->_pdo->exec("DROP TABLE `" . $this->_table . "`");
 	}
+
+	/**
+	 * Comment a table, internal use only
+	 */
+	private function comment($comment) {
+		return $this->_pdo->exec("ALTER TABLE `" . $this->_table . "` COMMENT = '" . $comment . "'");
+	}
 }
 
 /**
