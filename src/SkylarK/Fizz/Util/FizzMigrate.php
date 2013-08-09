@@ -32,6 +32,9 @@ class FizzMigrate
 	 * $object->addField("value", "varchar(255)");
 	 * $object->setPrimary("key", true);
 	 * $object->setUnique("value", true);
+	 * 
+	 * // Commit changes to DB
+	 * $object->commit();
 	 *
 	 * // Then list your changes
 	 * $object->beginMigration();
@@ -42,16 +45,13 @@ class FizzMigrate
 	 * $object->beginMigration();
 	 * $object->retype("value", "text");
 	 * $object->endMigration();
-	 *
-	 * // Commit changes to DB
-	 * $object->commit();
 	 * 
 	 * @param string $tableName The name of the table we relate too
 	 * @param string $schemaVersion The version of the schema we are working on. Important for upgrades
 	 */
 	public function __construct($tableName) {
 		$this->_table = $tableName;
-		$this->_version = 0;
+		$this->_version = 1;
 		$this->_fields = array();
 		$this->_pdo = FizzConfig::getDB();
 		if (!$this->_pdo) {
@@ -70,7 +70,7 @@ class FizzMigrate
 	 * End a set of migrations
 	 */
 	public function endMigration() {
-		// -
+		$this->commit();
 	}
 
 	/**
@@ -81,6 +81,13 @@ class FizzMigrate
 	 */
 	public function addField($name, $type) {
 		$this->_fields[$name] = array("type" => $type);
+	}
+
+	/**
+	 * Commit chanegs to DB
+	 */
+	public function commit() {
+		$this->comment($this->_version);
 	}
 
 	/**
