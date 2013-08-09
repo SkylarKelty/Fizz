@@ -11,6 +11,12 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
+	public function setUp() {
+		// Drop each test
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->drop();
+	}
+
 	// Tests
 
 	public function test_CommitFailsWithoutFields() {

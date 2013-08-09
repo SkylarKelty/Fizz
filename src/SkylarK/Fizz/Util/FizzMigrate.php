@@ -146,14 +146,24 @@ class FizzMigrate
 	 * Truncate the table
 	 */
 	public function truncate() {
-		return $this->_pdo->exec("TRUNCATE TABLE `" . $this->_table . "`");
+		if ($this->_pdo->exec("TRUNCATE TABLE `" . $this->_table . "`") === false) {
+			$error = $this->_pdo->errorInfo();
+			$this->_errors[] = "Failed to truncate database! Reason given: " . $error[2];
+			return false;
+		}
+		return true;
 	}
 
 	/**
 	 * Drop the table
 	 */
 	public function drop() {
-		return $this->_pdo->exec("DROP TABLE `" . $this->_table . "`");
+		if ($this->_pdo->exec("DROP TABLE `" . $this->_table . "`") === false) {
+			$error = $this->_pdo->errorInfo();
+			$this->_errors[] = "Failed to drop database! Reason given: " . $error[2];
+			return false;
+		}
+		return true;
 	}
 
 	/**
