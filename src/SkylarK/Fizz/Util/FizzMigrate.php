@@ -98,10 +98,10 @@ class FizzMigrate
 	 * @param boolean $value True if this field should be a primary key, false if not
 	 */
 	public function setPrimary($name, $value = true) {
-		// ALTER TABLE Demo DROP PRIMARY KEY
-		// if ($value) {
-		// 	ALTER TABLE  `Demo` ADD PRIMARY KEY (  `key` )
-		// }
+		$this->_pdo->exec("ALTER TABLE `" . $this->_table . "` DROP PRIMARY KEY");
+		if ($value) {
+			$this->_pdo->exec("ALTER TABLE  `" . $this->_table . "` ADD PRIMARY KEY (  `" . $name . "` )");
+		}
 	}
 
 	/**
