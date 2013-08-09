@@ -236,7 +236,7 @@ class FizzMigrate
 	 * This command is not queued and is committed straight away
 	 */
 	public function op_drop() {
-		return $this->_operation("DROP TABLE `" . $this->_table . "`");
+		return $this->_operation("DROP TABLE IF EXISTS `" . $this->_table . "`");
 	}
 
 	/**
