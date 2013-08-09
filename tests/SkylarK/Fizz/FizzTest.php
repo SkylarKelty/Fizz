@@ -14,7 +14,9 @@ class Demo extends SkylarK\Fizz\Fizz
 
 class FizzTest extends PHPUnit_Framework_TestCase
 {
-	public static function setUpBeforeClass() {
+	public function setUp() {
+		// Although it seems horribly inefficient, it ensures each test is clean
+		// and fresh. It's for tests, so accuracy > efficiency
 		try {
 			SkylarK\Fizz\FizzConfig::setDB("mysql:dbname=testdb;host=127.0.0.1", "travis", "");
 		}
