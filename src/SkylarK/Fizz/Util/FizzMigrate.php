@@ -167,7 +167,7 @@ class FizzMigrate
 	public function addField($name, $type, $null = false) {
 		$this->_fields[$name] = array("type" => $type, "null" => $null);
 		if ($this->_version > 0) {
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD `" . $name . "` " . $type . " NOT NULL)";
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD " . $this->_getFieldSQL($name, $this->_fields[$name]);
 		}
 	}
 
