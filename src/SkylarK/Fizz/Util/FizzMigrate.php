@@ -91,6 +91,7 @@ class FizzMigrate
 		if ($this->_version > $this->_table_version) {
 			$this->commit();
 		}
+		$this->_operations = array();
 	}
 
 	/**
@@ -150,6 +151,9 @@ class FizzMigrate
 
 			// Commit all the ops above
 			$this->_pdo->commit();
+
+			// Reset operations
+			$this->_operations = array();
 		}
 
 		// Set the table comment
