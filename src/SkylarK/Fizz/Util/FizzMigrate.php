@@ -172,6 +172,18 @@ class FizzMigrate
 	}
 
 	/**
+	 * Remove a field from this model
+	 * 
+	 * @param string $name The name of the field
+	 */
+	public function removeField($name) {
+		unset($this->_fields[$name]);
+		if ($this->_version > 0) {
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` DROP `" . $name . "`";
+		}
+	}
+
+	/**
 	 * Turn a field into a primary key, or remove one
 	 * 
 	 * @param string  $name  The name of the field

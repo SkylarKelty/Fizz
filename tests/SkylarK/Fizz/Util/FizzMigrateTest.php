@@ -83,7 +83,32 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(isset($fields[2]));
 		$this->assertTrue($fields[2]['name'] == "another_value");
 		$this->assertTrue($fields[2]['len'] == 225);
+	}
 
+	public function test_RemoveField() {
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$object->addField("value", "varchar(125)");
+		$this->assertTrue($object->commit());
+
+		// Check fields
+		$fields = $object->getActualFields();
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertTrue($fields[0]['name'] == "key");
+		$this->assertTrue(isset($fields[1]));
+		$this->assertTrue($fields[1]['name'] == "value");
+
+		$object->beginMigration();
+		$object->removeField("value");
+		$this->assertTrue($object->endMigration());
+
+		// Check fields
+		$fields = $object->getActualFields();
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertTrue($fields[0]['name'] == "key");
+		$this->assertTrue(!isset($fields[1]));
 	}
 
 	// -----------------------------------------------------------------------------------------
