@@ -98,20 +98,6 @@ class FizzMigrate
 	}
 
 	/**
-	 * Add a new field to this model
-	 * 
-	 * @param string $name The name of the field
-	 * @param string $type SQL Type
-	 * @param boolean $null Can this column be null? (Default: no)
-	 */
-	public function addField($name, $type, $null = false) {
-		$this->_fields[$name] = array("type" => $type, "null" => $null);
-		if ($this->_version > 0) {
-			//$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD `" . $name . "` INT(12) NOT NULL)";
-		}
-	}
-
-	/**
 	 * Commit chanegs to DB
 	 */
 	public function commit() {
@@ -169,6 +155,20 @@ class FizzMigrate
 		$this->_table_version = $this->_version;
 
 		return true;
+	}
+
+	/**
+	 * Add a new field to this model
+	 * 
+	 * @param string $name The name of the field
+	 * @param string $type SQL Type
+	 * @param boolean $null Can this column be null? (Default: no)
+	 */
+	public function addField($name, $type, $null = false) {
+		$this->_fields[$name] = array("type" => $type, "null" => $null);
+		if ($this->_version > 0) {
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD `" . $name . "` INT(12) NOT NULL)";
+		}
 	}
 
 	/**
