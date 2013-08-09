@@ -57,6 +57,7 @@ class FizzMigrate
 		if (!$this->_pdo) {
 			throw new Exceptions\FizzDatabaseConnectionException("Could not connect to Database");
 		}
+		$this->exists();
 	}
 
 	/**
@@ -116,6 +117,13 @@ class FizzMigrate
 	 */
 	public function drop() {
 		return $this->_pdo->exec("DROP TABLE `" . $this->_table . "`");
+	}
+
+	/**
+	 * Does this table exist?
+	 */
+	protected function exists() {
+		die($this->_pdo->exec("SELECT 1 FROM test"));
 	}
 
 	/**
