@@ -16,12 +16,16 @@ class FizzMigrate
 	private $_table;
 	/** Track our version */
 	private $_version;
+	/** Track our database version */
+	private $_table_version;
 	/** Track our fields */
 	private $_fields;
 	/** Our PDO instance */
 	private $_pdo;
 	/** Our error stack */
 	private $_errors;
+	/** Our operation stack */
+	private $_operations;
 
 	/**
 	 * Construct a new migrations object.
@@ -77,13 +81,16 @@ class FizzMigrate
 			$this->commit();
 		}
 		$this->_version++;
+		$this->_operations = array();
 	}
 
 	/**
 	 * End a set of migrations
 	 */
 	public function endMigration() {
-		$this->commit();
+		if ($this->_version > $this->_table_version) {
+			$this->commit();
+		}
 	}
 
 	/**
@@ -101,30 +108,55 @@ class FizzMigrate
 	 * Commit chanegs to DB
 	 */
 	public function commit() {
-		// If we are at version 0, increment version to alert beginMigration(...) to the fact
-		// we have committed the initial schema.
-		if ($this->_version == 0) {
-			$this->_version++;
-		}
-
 		// Bail out if we have no fields
 		if (count($this->_fields) === 0) {
 			$this->_errors[] = "No fields set whilst trying to commit";
 			return false;
 		}
 
-		// Create the table if it doesnt exist yet
-		if (!$this->exists()) {
-			// Create the table
-			if ($this->create() === false) {
+		// If we are at version 0, increment version to alert beginMigration(...) to the fact
+		// we have committed the initial schema.
+		if ($this->_version == 0) {
+			// Also check if the table exists
+			if (!$this->exists()) {
+				// Create the table
+				if ($this->create() === false) {
+					$error = $this->_pdo->errorInfo();
+					$this->_errors[] = "Failed to create database! Reason given: " . $error[2];
+					return false;
+				}
+				$this->_version = 1;
+			}
+		}
+
+		// Run through operations
+		if (count($this->_operations) > 0) {
+			// Begin a transaction
+			if (!$this->_pdo->beginTransaction()) {
 				$error = $this->_pdo->errorInfo();
-				$this->_errors[] = "Failed to create database! Reason given: " . $error[2];
+				$this->_errors[] = "Could not begin a transaction! Reason given: " . $error[2];
 				return false;
 			}
+
+			// Attempt all operations
+			foreach ($this->_operations as $operation) {
+				if ($this->_pdo->exec($operation) === false) {
+					$error = $this->_pdo->errorInfo();
+					$this->_errors[] = "Operation Failed: '" . $operation . "' Reason given: " . $error[2];
+					$this->_pdo->rollBack();
+					return false;
+				}
+			}
+
+			// Commit all the ops above
+			$this->_pdo->commit();
 		}
 
 		// Set the table comment
 		$this->comment($this->_version);
+
+		// Set the tracking version
+		$this->_table_version = $this->_version;
 
 		return true;
 	}
@@ -136,9 +168,10 @@ class FizzMigrate
 	 * @param boolean $value True if this field should be a primary key, false if not
 	 */
 	public function setPrimary($name, $value = true) {
-		$this->_pdo->exec("ALTER TABLE `" . $this->_table . "` DROP PRIMARY KEY");
 		if ($value) {
-			$this->_pdo->exec("ALTER TABLE  `" . $this->_table . "` ADD PRIMARY KEY (  `" . $name . "` )");
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD PRIMARY KEY (  `" . $name . "` )";
+		} else {
+			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP PRIMARY KEY";
 		}
 	}
 
@@ -164,7 +197,7 @@ class FizzMigrate
 		$sql .= implode(",", $fields);
 		$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 
-		return $this->_pdo->exec($sql);
+		return $this->_pdo->exec($sql) !== false;
 	}
 
 	/**
@@ -191,30 +224,34 @@ class FizzMigrate
 	}
 
 	/**
-	 * Truncate the table
+	 * Truncate the table.
+	 * This command is not queued and is committed straight away
 	 */
-	public function truncate() {
+	public function op_truncate() {
 		return $this->_operation("TRUNCATE TABLE `" . $this->_table . "`");
 	}
 
 	/**
-	 * Drop the table
+	 * Drop the table.
+	 * This command is not queued and is committed straight away
 	 */
-	public function drop() {
+	public function op_drop() {
 		return $this->_operation("DROP TABLE `" . $this->_table . "`");
 	}
 
 	/**
-	 * Optimize the table
+	 * Optimize the table.
+	 * This command is not queued and is committed straight away
 	 */
-	public function optimize() {
+	public function op_optimize() {
 		return $this->_operation("OPTIMIZE TABLE `" . $this->_table . "`");
 	}
 
 	/**
-	 * Flush the table
+	 * Flush the table.
+	 * This command is not queued and is committed straight away
 	 */
-	public function flush() {
+	public function op_flush() {
 		return $this->_operation("FLUSH TABLE `" . $this->_table . "`");
 	}
 }

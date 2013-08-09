@@ -14,7 +14,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 
 		// Drop each test
 		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
-		$object->drop();
+		$object->op_drop();
 	}
 
 	// -----------------------------------------------------------------------------------------
@@ -30,6 +30,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
 		$object->addField("key", "int(11)");
 		$object->addField("value", "varchar(125)");
+		$this->assertTrue($object->commit());
 		$object->setPrimary("key", true);
 		$this->assertTrue($object->commit());
 	}
@@ -38,20 +39,20 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
 		$object->addField("key", "int(11)");
 		$this->assertTrue($object->commit());
-		$this->assertTrue($object->truncate());
+		$this->assertTrue($object->op_truncate());
 	}
 
 	public function test_Optimize() {
 		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
 		$object->addField("key", "int(11)");
 		$this->assertTrue($object->commit());
-		$this->assertTrue($object->optimize());
+		$this->assertTrue($object->op_optimize());
 	}
 
 	public function test_Flush() {
 		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
 		$object->addField("key", "int(11)");
 		$this->assertTrue($object->commit());
-		$this->assertTrue($object->truncate());
+		$this->assertTrue($object->op_truncate());
 	}
 }
