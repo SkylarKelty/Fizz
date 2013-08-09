@@ -53,7 +53,7 @@ class FizzMigrate
 		$this->_table = $tableName;
 		$this->_version = 1;
 		$this->_fields = array();
-		$this->_pdo = FizzConfig::getDB();
+		$this->_pdo = \SkylarK\Fizz\FizzConfig::getDB();
 		if (!$this->_pdo) {
 			throw new Exceptions\FizzDatabaseConnectionException("Could not connect to Database");
 		}
@@ -88,6 +88,7 @@ class FizzMigrate
 	 */
 	public function commit() {
 		$this->comment($this->_version);
+		return true;
 	}
 
 	/**
