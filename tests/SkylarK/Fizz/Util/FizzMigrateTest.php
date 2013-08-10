@@ -346,29 +346,4 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->addField("extra", "varchar(325)");
 		$this->assertTrue($object->endMigration());
 	}
-
-	// -----------------------------------------------------------------------------------------
-	// Operation Tests
-	// -----------------------------------------------------------------------------------------
-
-	public function test_Truncate() {
-		$object = new TestableFizzMigrate("Example");
-		$object->addField("key", "int(11)");
-		$this->assertTrue($object->commit());
-		$this->assertTrue($object->op_truncate());
-	}
-
-	public function test_Optimize() {
-		$object = new TestableFizzMigrate("Example");
-		$object->addField("key", "int(11)");
-		$this->assertTrue($object->commit());
-		$this->assertTrue($object->op_optimize());
-	}
-
-	public function test_Flush() {
-		$object = new TestableFizzMigrate("Example");
-		$object->addField("key", "int(11)");
-		$this->assertTrue($object->commit());
-		$this->assertTrue($object->op_truncate());
-	}
 }
