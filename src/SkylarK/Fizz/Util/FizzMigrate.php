@@ -287,7 +287,7 @@ class FizzMigrate
 	/**
 	 * Returns a list of fields currently in the database
 	 */
-	public function _getActualFields() {
+	protected function _getActualFields() {
 		$statement = $this->_pdo->query("SELECT * FROM `" . $this->_table . "` LIMIT 1");
 
 		$columns = array();
