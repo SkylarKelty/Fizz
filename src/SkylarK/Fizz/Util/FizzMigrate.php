@@ -226,6 +226,20 @@ class FizzMigrate
 	}
 
 	/**
+	 * Make a field Unique, or not
+	 * 
+	 * @param string  $name  The name of the field
+	 * @param boolean $value True if this field should be unique, false if not
+	 */
+	public function setUnique($name, $value = true) {
+		if ($value) {
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD UNIQUE `" . $name . "`";
+		} else {
+			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP UNIQUE `" . $name . "`";
+		}
+	}
+
+	/**
 	 * Create the table, internal use only
 	 */
 	protected function create() {
