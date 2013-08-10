@@ -39,6 +39,13 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->addField("value", "varchar(125)");
 		$object->setPrimary("key", true);
 		$this->assertTrue($object->commit());
+
+		// Check actual DB
+		$fields = $object->getActualFields();
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertTrue(isset($fields[1]));
+		$this->assertEquals(array("not_null", "primary_key"), $fields[0]['flags']);
 	}
 
 	public function test_SimpleTransaction() {
@@ -46,9 +53,25 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->addField("key", "int(11)");
 		$object->addField("value", "varchar(125)");
 		$this->assertTrue($object->commit());
+
+		// Check actual DB
+		$fields = $object->getActualFields();
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertTrue(isset($fields[1]));
+		$this->assertEquals(array("not_null"), $fields[0]['flags']);
+
+		// Do migration
 		$object->beginMigration();
 		$object->setPrimary("key", true);
 		$this->assertTrue($object->endMigration());
+
+		// Check actual DB
+		$fields = $object->getActualFields();
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertTrue(isset($fields[1]));
+		$this->assertEquals(array("not_null", "primary_key"), $fields[0]['flags']);
 	}
 
 	public function test_AddField() {
