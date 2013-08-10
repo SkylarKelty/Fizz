@@ -376,7 +376,7 @@ class FizzMigrate
 		for ($i = 0; $i < $column_count; $i++) {
 			$meta = $statement->getColumnMeta($i);
 			$length = $this->_getTrueLength($meta['name']);
-			$meta['truelength'] = $length;
+			$meta['truelength'] = $length === false ? $meta['len'] : $length;
 			$columns[] = $meta;
 		}
 
@@ -401,7 +401,7 @@ class FizzMigrate
 
 		$q = $q->fetchAll();
 		$len = $q[0]["character_maximum_length"];
-		return is_numeric($len) ? intval($len) : $len;
+		return is_numeric($len) ? intval($len) : false;
 	}
 
 	/**

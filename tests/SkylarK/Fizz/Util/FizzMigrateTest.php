@@ -102,7 +102,9 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals("key", $fields[0]['name']);
 		$this->assertEquals("value", $fields[1]['name']);
 		$this->assertEquals("another_value", $fields[2]['name']);
-		$this->assertEquals(11, $fields[0]['len']);
+		$this->assertEquals(11, $fields[0]['truelength']);
+		$this->assertEquals(125, $fields[1]['truelength']);
+		$this->assertEquals(225, $fields[2]['truelength']);
 	}
 
 	public function test_RemoveField() {
@@ -266,7 +268,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$fields = $object->call("_getActualFields");
 		$this->assertTrue(is_array($fields));
 		$this->assertTrue(isset($fields[0]));
-		$this->assertEquals(11, $fields[0]['len']);
+		$this->assertEquals(11, $fields[0]['truelength']);
 
 		// Do migration
 		$object->beginMigration();
@@ -277,7 +279,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$fields = $object->call("_getActualFields");
 		$this->assertTrue(is_array($fields));
 		$this->assertTrue(isset($fields[0]));
-		$this->assertEquals(22, $fields[0]['len']);
+		$this->assertEquals(22, $fields[0]['truelength']);
 	}
 
 	public function test_ResizeWithNoCurrentSize() {
@@ -289,7 +291,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$fields = $object->call("_getActualFields");
 		$this->assertTrue(is_array($fields));
 		$this->assertTrue(isset($fields[0]));
-		$this->assertEquals(11, $fields[0]['len']);
+		$this->assertEquals(11, $fields[0]['truelength']);
 
 		// Do migration
 		$object->beginMigration();
@@ -300,7 +302,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$fields = $object->call("_getActualFields");
 		$this->assertTrue(is_array($fields));
 		$this->assertTrue(isset($fields[0]));
-		$this->assertEquals(22, $fields[0]['len']);
+		$this->assertEquals(22, $fields[0]['truelength']);
 	}
 
 	public function test_Retype() {
