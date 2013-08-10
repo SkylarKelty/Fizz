@@ -26,6 +26,11 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($object->commit());
 	}
 
+	public function test_GetDatabase() {
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$this->assertEquals("testdb", $object->getDatabase());
+	}
+
 	public function test_Commit() {
 		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
 		$object->addField("key", "int(11)");
@@ -213,6 +218,29 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(isset($fields[2]));
 		$this->assertEquals(array("not_null", "primary_key"), $fields[0]['flags']); // The first unique is a PKey
 		$this->assertEquals(array("not_null", "unique_key"), $fields[2]['flags']);
+	}
+
+	public function test_ReturnMigrations() {
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$object->addField("value", "varchar(125)");
+		$this->assertTrue($object->commit());
+
+		// Do migration
+		$object->beginMigration();
+		$object->addField("extra", "varchar(325)");
+		$this->assertTrue($object->endMigration());
+
+		// Reset the object to ensure it doesnt run unnecessary migrations
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$object->addField("value", "varchar(125)");
+		$this->assertTrue($object->commit());
+
+		// Do migration
+		$object->beginMigration();
+		$object->addField("extra", "varchar(325)");
+		$this->assertTrue($object->endMigration());
 	}
 
 	// -----------------------------------------------------------------------------------------

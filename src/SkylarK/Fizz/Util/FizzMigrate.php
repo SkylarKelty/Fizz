@@ -119,6 +119,8 @@ class FizzMigrate
 					return false;
 				}
 				$this->_version = 1;
+			} else {
+				// Obtain the table version
 			}
 		}
 
@@ -298,6 +300,23 @@ class FizzMigrate
 		$result = $statement->fetchAll(); // Clear out
 
 		return $columns;
+	}
+
+	/**
+	 * Get a table's comment
+	 */
+	protected function getDatabase() {
+		$q = $this->_pdo->query("SELECT DATABASE() AS name;")->fetchAll();
+		return $q[0]["name"];
+	}
+
+	/**
+	 * Get a table's comment
+	 */
+	protected function getComment() {
+		//$sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='' AND AND table_name='" . $this->_table . "'";
+		//$q = $this->_pdo->exec($sql);
+
 	}
 
 	// -----------------------------------------------------------------------------------------
