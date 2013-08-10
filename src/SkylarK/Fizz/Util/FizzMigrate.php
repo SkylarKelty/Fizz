@@ -385,20 +385,6 @@ class FizzMigrate
 	/**
 	 * Get a table's comment
 	 */
-	protected function _getDatabase() {
-		$q = $this->_pdo->query("SELECT DATABASE() AS name;");
-		if ($q === false) {
-			$error = $this->_pdo->errorInfo();
-			$this->_error("_getDatabase Failed! Reason given: " . $error[2]);
-			return false;
-		}
-		$q = $q->fetchAll();
-		return $q[0]["name"];
-	}
-
-	/**
-	 * Get a table's comment
-	 */
 	protected function _getComment() {
 		// Find our version
 		$sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema=DATABASE() AND table_name='" . $this->_table . "'";

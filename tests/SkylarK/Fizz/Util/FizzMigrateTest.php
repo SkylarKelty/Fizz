@@ -45,11 +45,6 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		ob_get_clean();
 	}
 
-	public function test_GetDatabase() {
-		$object = new TestableFizzMigrate("Example");
-		$this->assertEquals("testdb", $object->call("_getDatabase"));
-	}
-
 	public function test_Commit() {
 		$object = new TestableFizzMigrate("Example");
 		$object->addField("key", "int(11)");
