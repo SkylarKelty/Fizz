@@ -219,7 +219,7 @@ class FizzMigrate
 	 */
 	public function setIndex($name, $value = true) {
 		if ($value) {
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD INDEX `" . $name . "`";
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD INDEX (`" . $name . "`)";
 		} else {
 			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP INDEX `" . $name . "`";
 		}
@@ -233,7 +233,7 @@ class FizzMigrate
 	 */
 	public function setUnique($name, $value = true) {
 		if ($value) {
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD UNIQUE `" . $name . "`";
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD UNIQUE (`" . $name . "`)";
 		} else {
 			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP UNIQUE `" . $name . "`";
 		}
