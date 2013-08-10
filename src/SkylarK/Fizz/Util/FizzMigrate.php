@@ -380,7 +380,7 @@ class FizzMigrate
 			$columns[] = $meta;
 		}
 
-		$result = $statement->fetchAll(); // Clear out
+		$statement->fetchAll(); // Clear out
 
 		return $columns;
 	}
