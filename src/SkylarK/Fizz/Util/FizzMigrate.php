@@ -121,17 +121,7 @@ class FizzMigrate
 		// If we are at version 0, create the table or update the table version info
 		if ($this->_version == 0) {
 			// Also check if the table exists
-			if (!$this->_exists()) {
-				// Create the table
-				if ($this->create() === false) {
-					$error = $this->_pdo->errorInfo();
-					$this->_error("Failed to create database! Reason given: " . $error[2]);
-					return false;
-				}
-
-				// Increment version to alert beginMigration(...) to the fact we have committed the initial schema.
-				$this->_version = 1;
-			} else {
+			if ($this->_exists()) {
 				// Obtain the table version
 				$comment = $this->_getComment();
 				if ($comment === false) {
@@ -142,6 +132,16 @@ class FizzMigrate
 				// We have nothing to do here
 				return true;
 			}
+
+			// The table does not exist, create the table
+			if ($this->create() === false) {
+				$error = $this->_pdo->errorInfo();
+				$this->_error("Failed to create database! Reason given: " . $error[2]);
+				return false;
+			}
+
+			// Increment version to alert beginMigration(...) to the fact we have committed the initial schema.
+			$this->_version = 1;
 		}
 
 		// Run through operations
