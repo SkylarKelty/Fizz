@@ -40,7 +40,9 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 
 	public function test_CommitFailsWithoutFields() {
 		$object = new TestableFizzMigrate("Example");
+		ob_start();
 		$this->assertFalse($object->commit());
+		ob_get_clean();
 	}
 
 	public function test_GetDatabase() {
