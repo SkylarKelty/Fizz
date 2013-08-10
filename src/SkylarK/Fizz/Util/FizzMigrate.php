@@ -13,17 +13,17 @@ namespace SkylarK\Fizz\Util;
 class FizzMigrate
 {
 	/** Store our table name */
-	private $_table;
+	protected $_table;
 	/** Track our version */
-	private $_version;
+	protected $_version;
 	/** Track our database version */
-	private $_table_version;
+	protected $_table_version;
 	/** Track our fields */
 	private $_fields;
 	/** Our PDO instance */
-	private $_pdo;
+	protected $_pdo;
 	/** Our error stack */
-	private $_errors;
+	protected $_errors;
 	/** Our operation stack */
 	private $_operations;
 
@@ -107,7 +107,6 @@ class FizzMigrate
 			$this->_errors[] = "No fields set whilst trying to commit";
 			return false;
 		}
-				print $this->_version . "hey";
 
 		// If we are at version 0, create the table or update the table version info
 		if ($this->_version == 0) {
@@ -124,8 +123,12 @@ class FizzMigrate
 				$this->_version = 1;
 			} else {
 				// Obtain the table version
-				$this->_table_version = intval($this->_getComment());
-				print $this->_table_version . "hey";
+				$comment = $this->_getComment();
+				if ($comment === false) {
+					$this->_errors[] = "Commit failed: could not find comment";
+					return false;
+				}
+				$this->_table_version = intval($comment);
 				// We have nothing to do here
 				return true;
 			}
@@ -158,7 +161,7 @@ class FizzMigrate
 		}
 
 		// Set the table comment
-		$this->comment($this->_version);
+		$this->_comment($this->_version);
 
 		// Set the tracking version
 		$this->_table_version = $this->_version;
@@ -269,7 +272,7 @@ class FizzMigrate
 	/**
 	 * Comment a table, internal use only
 	 */
-	protected function comment($comment) {
+	protected function _comment($comment) {
 		return $this->_pdo->exec("ALTER TABLE `" . $this->_table . "` COMMENT = '" . $comment . "'");
 	}
 
@@ -281,7 +284,12 @@ class FizzMigrate
 	 * Does this table exist?
 	 */
 	protected function _exists() {
-		return $this->_pdo->exec("SELECT 1 FROM `" . $this->_table . "`") !== false;
+		$q = $this->_pdo->query("SELECT 1 FROM `" . $this->_table . "`");
+		if ($q === false) {
+			return false;
+		}
+		$q->closeCursor();
+		return true;
 	}
 
 	/**
@@ -328,6 +336,11 @@ class FizzMigrate
 	 */
 	protected function _getComment() {
 		$db = $this->_getDatabase();
+		if ($db === false) {
+			return false;
+		}
+
+		// Find our version
 		$sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $db . "' AND table_name='" . $this->_table . "'";
 		$q = $this->_pdo->query($sql);
 		if ($q === false) {
@@ -335,6 +348,7 @@ class FizzMigrate
 			$this->_errors[] = "_getComment Failed: '" . $sql . "' Reason given: " . $error[2];
 			return false;
 		}
+
 		$q = $q->fetchAll();
 		return $q[0]["table_comment"];
 	}
