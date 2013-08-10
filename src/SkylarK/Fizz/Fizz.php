@@ -16,12 +16,9 @@ abstract class Fizz
 	private $_fizz_pdo;
 
 	/**
-	 * Initialize Fizz with valid database connection details
-	 * 
-	 * @param string $db_dsn A PDO connection string
-	 * @param string $table The name of the table this model relates too
+	 * Initialize a Fizz object
 	 */
-	public function __construct($table = NULL) {
+	public function __construct() {
 		$this->_fizz_pdo = FizzConfig::getDB();
 		if (!$this->_fizz_pdo) {
 			throw new Exceptions\FizzDatabaseConnectionException("Could not connect to Database");
