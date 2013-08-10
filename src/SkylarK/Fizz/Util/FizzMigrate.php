@@ -217,7 +217,15 @@ class FizzMigrate
 	 */
 	public function resizeField($name, $size) {
 		$currentType = $this->_fields[$name]['type'];
-		$newType = preg_replace("/\([0-9\s]*\)/", "(".$size.")", $currentType);
+
+		// Work out the new type
+		if (strpos($currentType, "(")) {
+			$newType = preg_replace("/\([0-9\s]*\)/", "(".$size.")", $currentType);
+		} else {
+			$newType = $currentType . "(" . $size . ")";
+		}
+		
+
 		$this->_fields[$name]['type'] = $newType;
 
 		if ($this->_version > 0) {
