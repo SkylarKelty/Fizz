@@ -3,66 +3,11 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "e27573e991a09ce8939506552851d2fb",
+    "hash": "626ffe2c20fd65eb74b3fb0422d069c0",
     "packages": [
 
     ],
     "packages-dev": [
-        {
-            "name": "pdepend/pdepend",
-            "version": "1.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pdepend/pdepend.git",
-                "reference": "1.1.1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pdepend/pdepend/zipball/1.1.1",
-                "reference": "1.1.1",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.2.3"
-            },
-            "bin": [
-                "src/bin/pdepend"
-            ],
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "description": "Official version of pdepend to be handled with Composer",
-            "time": "2013-07-25 19:23:48"
-        },
-        {
-            "name": "phpmd/phpmd",
-            "version": "1.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/phpmd/phpmd.git",
-                "reference": "1.5.0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/phpmd/phpmd/zipball/1.5.0",
-                "reference": "1.5.0",
-                "shasum": ""
-            },
-            "require": {
-                "pdepend/pdepend": ">=1.1.1",
-                "php": ">=5.3.0"
-            },
-            "bin": [
-                "src/bin/phpmd"
-            ],
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "include-path": [
-                "../../pdepend/pdepend/src/main/php",
-                "src/main/php"
-            ],
-            "description": "Official version of PHPMD handled with Composer.",
-            "time": "2013-07-26 14:47:02"
-        },
         {
             "name": "phpunit/php-code-coverage",
             "version": "1.2.12",

@@ -10,4 +10,7 @@ namespace SkylarK\Fizz\Exceptions;
 /**
  * Thrown if a model cannot connect with a database
  */
-class FizzDatabaseConnectionException extends \Exception {}
+class FizzDatabaseConnectionException extends \Exception 
+{
+	
+}
