@@ -198,7 +198,7 @@ class FizzMigrate
 	}
 
 	/**
-	 * Turn a field into a primary key, or remove one
+	 * Turn a field into a primary key, or remove a primary key
 	 * 
 	 * @param string  $name  The name of the field
 	 * @param boolean $value True if this field should be a primary key, false if not
@@ -208,6 +208,20 @@ class FizzMigrate
 			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD PRIMARY KEY (  `" . $name . "` )";
 		} else {
 			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP PRIMARY KEY";
+		}
+	}
+
+	/**
+	 * Turn a field into an index, or remove an index
+	 * 
+	 * @param string  $name  The name of the field
+	 * @param boolean $value True if this field should be an index, false if not
+	 */
+	public function setIndex($name, $value = true) {
+		if ($value) {
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD INDEX `" . $name . "`";
+		} else {
+			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP INDEX `" . $name . "`";
 		}
 	}
 
@@ -320,12 +334,3 @@ class FizzMigrate
 		return $this->_operation("FLUSH TABLE `" . $this->_table . "`");
 	}
 }
-
-/**
- * Queries to refer too:
- * `ALTER TABLE Demo DROP PRIMARY KEY`
- * ALTER TABLE  `Demo` ADD PRIMARY KEY (  `key` )
- * ALTER TABLE  `Demo` ADD INDEX (  `value` ) ;
- * `ALTER TABLE Demo DROP INDEX key`
- * ALTER TABLE  `Demo` ADD UNIQUE (`key`)
- */
