@@ -400,13 +400,8 @@ class FizzMigrate
 	 * Get a table's comment
 	 */
 	protected function _getComment() {
-		$db = $this->_getDatabase();
-		if ($db === false) {
-			return false;
-		}
-
 		// Find our version
-		$sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $db . "' AND table_name='" . $this->_table . "'";
+		$sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema=DATABASE() AND table_name='" . $this->_table . "'";
 		$q = $this->_pdo->query($sql);
 		if ($q === false) {
 			$error = $this->_pdo->errorInfo();
