@@ -5,6 +5,11 @@ class TestableFizzMigrate extends SkylarK\Fizz\Util\FizzMigrate
 	public function call($func) {
 		return $this->$func();
 	}
+
+	public function resetVersion() {
+		$this->_version = 0;
+		$this->_table_version = 0;
+	}
 }
 
 class FizzMigrateTest extends PHPUnit_Framework_TestCase
@@ -44,6 +49,14 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->addField("key", "int(11)");
 		$object->addField("value", "varchar(125)");
 		$this->assertTrue($object->commit());
+	}
+
+	public function test_Exists() {
+		$object = new TestableFizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$this->assertFalse($object->call("_exists"));
+		$this->assertTrue($object->commit());
+		$this->assertTrue($object->call("_exists"));
 	}
 
 	public function test_GetComment() {
@@ -247,15 +260,11 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($object->endMigration());
 
 		// Reset the object to ensure it doesnt run unnecessary migrations
-		//$object = new TestableFizzMigrate("Example");
-		//$object->addField("key", "int(11)");
-		//$object->addField("value", "varchar(125)");
-		//$this->assertTrue($object->commit());
-
-		// Do migration
-		//$object->beginMigration();
-		//$object->addField("extra", "varchar(325)");
-		//$this->assertTrue($object->endMigration());
+		$object->resetVersion();
+		$this->assertTrue($object->commit());
+		$object->beginMigration();
+		$object->addField("extra", "varchar(325)");
+		$this->assertTrue($object->endMigration());
 	}
 
 	// -----------------------------------------------------------------------------------------

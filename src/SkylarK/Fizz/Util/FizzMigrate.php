@@ -58,6 +58,7 @@ class FizzMigrate
 	public function __construct($tableName) {
 		$this->_table = $tableName;
 		$this->_version = 0;
+		$this->_table_version = 0;
 		$this->_fields = array();
 		$this->_errors = array();
 		$this->_pdo = \SkylarK\Fizz\FizzConfig::getDB();
@@ -107,8 +108,7 @@ class FizzMigrate
 			return false;
 		}
 
-		// If we are at version 0, increment version to alert beginMigration(...) to the fact
-		// we have committed the initial schema.
+		// If we are at version 0, create the table or update the table version info
 		if ($this->_version == 0) {
 			// Also check if the table exists
 			if (!$this->_exists()) {
@@ -118,9 +118,15 @@ class FizzMigrate
 					$this->_errors[] = "Failed to create database! Reason given: " . $error[2];
 					return false;
 				}
+
+				// Increment version to alert beginMigration(...) to the fact we have committed the initial schema.
 				$this->_version = 1;
 			} else {
 				// Obtain the table version
+				$this->_table_version = intval($this->_getComment());
+				print $this->_table_version . "hey";
+				// We have nothing to do here
+				return true;
 			}
 		}
 
@@ -309,7 +315,7 @@ class FizzMigrate
 		$q = $this->_pdo->query("SELECT DATABASE() AS name;");
 		if ($q === false) {
 			$error = $this->_pdo->errorInfo();
-			$this->_errors[] = "_getDatabase Failed: '" . $sql . "' Reason given: " . $error[2];
+			$this->_errors[] = "_getDatabase Failed! Reason given: " . $error[2];
 			return false;
 		}
 		$q = $q->fetchAll();
