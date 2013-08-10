@@ -374,12 +374,34 @@ class FizzMigrate
 		// Grab column meta
 		$column_count = $statement->columnCount();
 		for ($i = 0; $i < $column_count; $i++) {
-			$columns[] = $statement->getColumnMeta($i);
+			$meta = $statement->getColumnMeta($i);
+			$length = $this->_getTrueLength($meta['name']);
+			$meta['truelength'] = $length;
+			$columns[] = $meta;
 		}
 
 		$result = $statement->fetchAll(); // Clear out
 
 		return $columns;
+	}
+
+	/**
+	 * Returns the true length of a column
+	 */
+	protected function _getTrueLength($col) {
+		$sql = "SELECT character_maximum_length FROM information_schema.columns WHERE table_name='" . $this->_table . "'  AND table_schema=DATABASE()";
+		$sql .= " AND column_name='" . $col . "'";
+		$q = $this->_pdo->query($sql);
+		
+		if ($q === false) {
+			$error = $this->_pdo->errorInfo();
+			$this->_error("_getComment Failed: '" . $sql . "' Reason given: " . $error[2]);
+			return false;
+		}
+
+		$q = $q->fetchAll();
+		$len = $q[0]["character_maximum_length"];
+		return is_numeric($len) ? intval($len) : $len;
 	}
 
 	/**

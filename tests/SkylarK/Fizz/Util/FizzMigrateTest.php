@@ -6,8 +6,8 @@ class TestableFizzMigrate extends SkylarK\Fizz\Util\FizzMigrate
 		parent::__construct($tableName, self::$ERROR_MODE_PRINT);
 	}
 
-	public function call($func) {
-		return $this->$func();
+	public function call($func, $args = array()) {
+		return call_user_func_array(array($this, $func), $args);
 	}
 
 	public function resetVersion() {
@@ -67,19 +67,12 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals("1", $object->call("_getComment"));
 	}
 
-	public function test_PrimaryKeyCommit() {
+	public function test_GetTrueLength() {
 		$object = new TestableFizzMigrate("Example");
 		$object->addField("key", "int(11)");
 		$object->addField("value", "varchar(125)");
-		$object->setPrimary("key", true);
 		$this->assertTrue($object->commit());
-
-		// Check actual DB
-		$fields = $object->call("_getActualFields");
-		$this->assertTrue(is_array($fields));
-		$this->assertTrue(isset($fields[0]));
-		$this->assertTrue(isset($fields[1]));
-		$this->assertEquals(array("not_null", "primary_key"), $fields[0]['flags']);
+		$this->assertEquals(125, $object->call("_getTrueLength", array("value")));
 	}
 
 	public function test_AddField() {
@@ -163,6 +156,21 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(isset($fields[1]));
 		$this->assertEquals("key", $fields[0]['name']);
 		$this->assertEquals("new", $fields[1]['name']);
+	}
+
+	public function test_PrimaryKeyCommit() {
+		$object = new TestableFizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$object->addField("value", "varchar(125)");
+		$object->setPrimary("key", true);
+		$this->assertTrue($object->commit());
+
+		// Check actual DB
+		$fields = $object->call("_getActualFields");
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertTrue(isset($fields[1]));
+		$this->assertEquals(array("not_null", "primary_key"), $fields[0]['flags']);
 	}
 
 	public function test_SetPrimary() {
