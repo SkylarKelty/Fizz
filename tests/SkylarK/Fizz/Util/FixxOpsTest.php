@@ -19,6 +19,11 @@ class FizzOpsTest extends PHPUnit_Framework_TestCase
 		$object->commit();
 	}
 
+	public static function tearDownAfterClass() {
+		SkylarK\Fizz\Util\FizzOps::drop("Example");
+		SkylarK\Fizz\Util\FizzOps::drop("ExampleRename");
+	}
+
 	public function test_Truncate() {
 		$this->assertTrue(SkylarK\Fizz\Util\FizzOps::truncate("Example"));
 	}

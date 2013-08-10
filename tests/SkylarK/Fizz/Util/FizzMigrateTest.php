@@ -34,6 +34,10 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->op_drop();
 	}
 
+	public static function tearDownAfterClass() {
+		SkylarK\Fizz\Util\FizzOps::drop("Example");
+	}
+
 	// -----------------------------------------------------------------------------------------
 	// Tests
 	// -----------------------------------------------------------------------------------------
