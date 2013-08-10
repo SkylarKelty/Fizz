@@ -12,6 +12,13 @@ namespace SkylarK\Fizz\Util;
  */
 class FizzMigrate
 {
+	/** Error mode 1: store */
+	public static $ERROR_MODE_STORE = 0;
+	/** Error mode 2: print */
+	public static $ERROR_MODE_PRINT = 1;
+	/** Error mode 3: die */
+	public static $ERROR_MODE_DIE = 2;
+
 	/** Store our table name */
 	protected $_table;
 	/** Track our version */
@@ -24,6 +31,8 @@ class FizzMigrate
 	protected $_pdo;
 	/** Our error stack */
 	protected $_errors;
+	/** Our error mode */
+	protected $_error_mode;
 	/** Our operation stack */
 	private $_operations;
 
@@ -53,14 +62,15 @@ class FizzMigrate
 	 * $object->endMigration();
 	 * 
 	 * @param string $tableName The name of the table we relate too
-	 * @param string $schemaVersion The version of the schema we are working on. Important for upgrades
+	 * @param string $errorMode The error mode we should use (ERROR_MODE_STORE, ERROR_MODE_PRINT, ERROR_MODE_DIE)
 	 */
-	public function __construct($tableName) {
+	public function __construct($tableName, $errorMode = 0) {
 		$this->_table = $tableName;
 		$this->_version = 0;
 		$this->_table_version = 0;
 		$this->_fields = array();
 		$this->_errors = array();
+		$this->_error_mode = $errorMode;
 		$this->_pdo = \SkylarK\Fizz\FizzConfig::getDB();
 		if (!$this->_pdo) {
 			throw new Exceptions\FizzDatabaseConnectionException("Could not connect to Database");
@@ -104,7 +114,7 @@ class FizzMigrate
 	public function commit() {
 		// Bail out if we have no fields
 		if (count($this->_fields) === 0) {
-			$this->_errors[] = "No fields set whilst trying to commit";
+			$this->_error("No fields set whilst trying to commit");
 			return false;
 		}
 
@@ -115,7 +125,7 @@ class FizzMigrate
 				// Create the table
 				if ($this->create() === false) {
 					$error = $this->_pdo->errorInfo();
-					$this->_errors[] = "Failed to create database! Reason given: " . $error[2];
+					$this->_error("Failed to create database! Reason given: " . $error[2]);
 					return false;
 				}
 
@@ -125,7 +135,7 @@ class FizzMigrate
 				// Obtain the table version
 				$comment = $this->_getComment();
 				if ($comment === false) {
-					$this->_errors[] = "Commit failed: could not find comment";
+					$this->_error("Commit failed: could not find comment");
 					return false;
 				}
 				$this->_table_version = intval($comment);
@@ -139,7 +149,7 @@ class FizzMigrate
 			// Begin a transaction
 			if (!$this->_pdo->beginTransaction()) {
 				$error = $this->_pdo->errorInfo();
-				$this->_errors[] = "Could not begin a transaction! Reason given: " . $error[2];
+				$this->_error("Could not begin a transaction! Reason given: " . $error[2]);
 				return false;
 			}
 
@@ -147,7 +157,7 @@ class FizzMigrate
 			foreach ($this->_operations as $operation) {
 				if ($this->_pdo->exec($operation) === false) {
 					$error = $this->_pdo->errorInfo();
-					$this->_errors[] = "Operation Failed: '" . $operation . "' Reason given: " . $error[2];
+					$this->_error("Operation Failed: '" . $operation . "' Reason given: " . $error[2]);
 					$this->_pdo->rollBack();
 					return false;
 				}
@@ -314,6 +324,23 @@ class FizzMigrate
 		return $this->_pdo->exec("ALTER TABLE `" . $this->_table . "` COMMENT = '" . $comment . "'");
 	}
 
+	/**
+	 * Handles errors
+	 */
+	protected function _error($error) {
+		switch ($this->_error_mode) {
+			case self::$ERROR_MODE_PRINT:
+				print $error;
+				break;
+			case self::$ERROR_MODE_DIE:
+				die($error);
+				break;
+			case self::$ERROR_MODE_STORE:
+			default:
+				$this->_errors[] = $error;
+		}
+	}
+
 	// -----------------------------------------------------------------------------------------
 	// Helpers
 	// -----------------------------------------------------------------------------------------
@@ -362,7 +389,7 @@ class FizzMigrate
 		$q = $this->_pdo->query("SELECT DATABASE() AS name;");
 		if ($q === false) {
 			$error = $this->_pdo->errorInfo();
-			$this->_errors[] = "_getDatabase Failed! Reason given: " . $error[2];
+			$this->_error("_getDatabase Failed! Reason given: " . $error[2]);
 			return false;
 		}
 		$q = $q->fetchAll();
@@ -383,7 +410,7 @@ class FizzMigrate
 		$q = $this->_pdo->query($sql);
 		if ($q === false) {
 			$error = $this->_pdo->errorInfo();
-			$this->_errors[] = "_getComment Failed: '" . $sql . "' Reason given: " . $error[2];
+			$this->_error("_getComment Failed: '" . $sql . "' Reason given: " . $error[2]);
 			return false;
 		}
 
@@ -401,7 +428,7 @@ class FizzMigrate
 	protected function _operation($sql) {
 		if ($this->_pdo->exec($sql) === false) {
 			$error = $this->_pdo->errorInfo();
-			$this->_errors[] = "Failed to truncate database! Reason given: " . $error[2];
+			$this->_error("Failed to truncate database! Reason given: " . $error[2]);
 			return false;
 		}
 		return true;

@@ -2,6 +2,10 @@
 
 class TestableFizzMigrate extends SkylarK\Fizz\Util\FizzMigrate
 {
+	public function __construct($tableName, $errorMode = 0) {
+		parent::__construct($tableName, self::$ERROR_MODE_PRINT);
+	}
+
 	public function call($func) {
 		return $this->$func();
 	}
