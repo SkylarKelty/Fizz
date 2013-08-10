@@ -64,4 +64,14 @@ class FizzOps
 	public static function flush($table) {
 		return self::_operation("FLUSH TABLE `" . $table . "`");
 	}
+
+	/**
+	 * Rename a table.
+	 *
+	 * @param string $from The name of the table to run the OP on
+	 * @param string $to   The new name of the table
+	 */
+	public static function rename($from, $to) {
+		return self::_operation("RENAME TABLE `" . $from . "` TO `" . $to . "`");
+	}
 }

@@ -34,4 +34,8 @@ class FizzOpsTest extends PHPUnit_Framework_TestCase
 	public function test_Drop() {
 		$this->assertTrue(SkylarK\Fizz\Util\FizzOps::drop("Example"));
 	}
+
+	public function test_Rename() {
+		$this->assertTrue(SkylarK\Fizz\Util\FizzOps::rename("Example", "ExampleRename"));
+	}
 }
