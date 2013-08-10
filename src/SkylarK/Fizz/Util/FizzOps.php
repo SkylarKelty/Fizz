@@ -23,7 +23,7 @@ class FizzOps
 
 		if ($pdo->exec($sql) === false) {
 			$error = $pdo->errorInfo();
-			return "Failed to truncate database! Reason given: " . $error[2];
+			return "Failed operation '" . $sql . "'! Reason given: " . $error[2];
 		}
 
 		return true;
