@@ -107,6 +107,7 @@ class FizzMigrate
 			$this->_errors[] = "No fields set whilst trying to commit";
 			return false;
 		}
+				print $this->_version . "hey";
 
 		// If we are at version 0, create the table or update the table version info
 		if ($this->_version == 0) {
