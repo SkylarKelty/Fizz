@@ -294,6 +294,29 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(22, $fields[0]['len']);
 	}
 
+	public function test_Retype() {
+		$object = new TestableFizzMigrate("Example");
+		$object->addField("key", "int");
+		$this->assertTrue($object->commit());
+
+		// Check actual DB
+		$fields = $object->call("_getActualFields");
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertEquals("LONG", $fields[0]['native_type']);
+
+		// Do migration
+		$object->beginMigration();
+		$object->retypeField("key", "bigint(11)");
+		$this->assertTrue($object->endMigration());
+
+		// Check actual DB
+		$fields = $object->call("_getActualFields");
+		$this->assertTrue(is_array($fields));
+		$this->assertTrue(isset($fields[0]));
+		$this->assertEquals("LONGLONG", $fields[0]['native_type']);
+	}
+
 	public function test_ReturnMigrations() {
 		$object = new TestableFizzMigrate("Example");
 		$object->addField("key", "int(11)");

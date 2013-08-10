@@ -234,6 +234,20 @@ class FizzMigrate
 	}
 
 	/**
+	 * ReType a field
+	 * 
+	 * @param string $name The name of the field
+	 * @param string $type The new type of the field
+	 */
+	public function retypeField($name, $type) {
+		$this->_fields[$name]['type'] = $type;
+
+		if ($this->_version > 0) {
+			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` CHANGE `" . $name . "` " . $this->_getFieldSQL($name, $this->_fields[$name]);
+		}
+	}
+
+	/**
 	 * Turn a field into a primary key, or remove a primary key
 	 * 
 	 * @param string  $name  The name of the field
