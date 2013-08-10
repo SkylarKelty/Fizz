@@ -306,7 +306,13 @@ class FizzMigrate
 	 * Get a table's comment
 	 */
 	protected function _getDatabase() {
-		$q = $this->_pdo->query("SELECT DATABASE() AS name;")->fetchAll();
+		$q = $this->_pdo->query("SELECT DATABASE() AS name;");
+		if ($q === false) {
+			$error = $this->_pdo->errorInfo();
+			$this->_errors[] = "_getDatabase Failed: '" . $sql . "' Reason given: " . $error[2];
+			return false;
+		}
+		$q = $q->fetchAll();
 		return $q[0]["name"];
 	}
 
@@ -314,9 +320,16 @@ class FizzMigrate
 	 * Get a table's comment
 	 */
 	protected function _getComment() {
-		//$sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='' AND AND table_name='" . $this->_table . "'";
-		//$q = $this->_pdo->exec($sql);
-
+		$db = $this->_getDatabase();
+		$sql = "SELECT table_comment FROM INFORMATION_SCHEMA.TABLES WHERE table_schema='" . $db . "' AND table_name='" . $this->_table . "'";
+		$q = $this->_pdo->query($sql);
+		if ($q === false) {
+			$error = $this->_pdo->errorInfo();
+			$this->_errors[] = "_getComment Failed: '" . $sql . "' Reason given: " . $error[2];
+			return false;
+		}
+		$q = $q->fetchAll();
+		return $q[0]["table_comment"];
 	}
 
 	// -----------------------------------------------------------------------------------------

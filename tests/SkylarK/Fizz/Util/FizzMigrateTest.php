@@ -46,6 +46,13 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($object->commit());
 	}
 
+	public function test_GetComment() {
+		$object = new TestableFizzMigrate("Example");
+		$object->addField("key", "int(11)");
+		$this->assertTrue($object->commit());
+		$this->assertEquals("1", $object->call("_getComment"));
+	}
+
 	public function test_PrimaryKeyCommit() {
 		$object = new TestableFizzMigrate("Example");
 		$object->addField("key", "int(11)");
