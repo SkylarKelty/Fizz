@@ -30,7 +30,7 @@ abstract class Fizz
 	 */
 	public static function tablename() {
 		$name = get_called_class();
-		$pos = strpos($name, '/');
+		$pos = strpos($name, '\\');
 		if ($pos === false) {
 			return $name;
 		}
