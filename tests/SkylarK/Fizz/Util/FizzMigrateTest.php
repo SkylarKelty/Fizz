@@ -349,4 +349,12 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->addField("extra", "varchar(325)");
 		$this->assertTrue($object->endMigration());
 	}
+
+	public function test_InitialPK() {
+		$object = new TestableFizzMigrate("PKTest");
+		$object->addField("key", "int(11) AUTO_INCREMENT");
+		$object->addField("value", "varchar(125)");
+		$object->setPrimary("key");
+		$this->assertTrue($object->commit());
+	}
 }
