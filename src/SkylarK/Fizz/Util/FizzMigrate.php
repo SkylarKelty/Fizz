@@ -35,6 +35,8 @@ class FizzMigrate
 	protected $_error_mode;
 	/** Our operation stack */
 	private $_operations;
+	/** Index stack */
+	private $_indexes;
 
 	/**
 	 * Construct a new migrations object.
@@ -69,6 +71,7 @@ class FizzMigrate
 		$this->_version = 0;
 		$this->_table_version = 0;
 		$this->_fields = array();
+		$this->_indexes = array();
 		$this->_errors = array();
 		$this->_error_mode = $errorMode;
 		$this->_pdo = \SkylarK\Fizz\FizzConfig::getDB();
@@ -265,8 +268,10 @@ class FizzMigrate
 	 */
 	public function setPrimary($name, $value = true) {
 		if ($value) {
+			$this->_indexes[$name] = "PRIMARY KEY";
 			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD PRIMARY KEY (  `" . $name . "` )";
 		} else {
+			unset($this->_indexes[$name]);
 			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP PRIMARY KEY";
 		}
 	}
@@ -279,8 +284,10 @@ class FizzMigrate
 	 */
 	public function setIndex($name, $value = true) {
 		if ($value) {
+			$this->_indexes[$name] = "INDEX";
 			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD INDEX (`" . $name . "`)";
 		} else {
+			unset($this->_indexes[$name]);
 			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP INDEX `" . $name . "`";
 		}
 	}
@@ -293,8 +300,10 @@ class FizzMigrate
 	 */
 	public function setUnique($name, $value = true) {
 		if ($value) {
+			$this->_indexes[$name] = "UNIQUE KEY";
 			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD UNIQUE (`" . $name . "`)";
 		} else {
+			unset($this->_indexes[$name]);
 			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP UNIQUE `" . $name . "`";
 		}
 	}
@@ -311,8 +320,26 @@ class FizzMigrate
 			$fields[] = $this->_getFieldSQL($name, $data);
 		}
 
+		// Build indexes into the fields
+		foreach ($this->_indexes as $name => $type) {
+			switch ($type) {
+				case "PRIMARY KEY":
+					$fields[] = "PRIMARY KEY (`{$name}`)";
+					break;
+				case "UNIQUE KEY":
+					$fields[] = "UNIQUE KEY `{$name}` (`{$name}`)";
+					break;
+				case "INDEX":
+					$fields[] = "KEY `{$name}` (`{$name}`)";
+					break;
+			}
+		}
+
 		$sql .= implode(",", $fields);
 		$sql .= ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
+		// Cleanup operations after we create a table for the first time
+		$this->_operations = array();
 
 		return $this->_pdo->exec($sql) !== false;
 	}
