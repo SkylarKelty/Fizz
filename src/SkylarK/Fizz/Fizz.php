@@ -29,7 +29,12 @@ abstract class Fizz
 	 * Returns the table name
 	 */
 	public static function tablename() {
-		return get_called_class();
+		$name = get_called_class();
+		$pos = strpos($name, '/');
+		if ($pos === false) {
+			return $name;
+		}
+		return substr($name, $pos);
 	}
 
 	/**
@@ -66,7 +71,7 @@ abstract class Fizz
 			$values[":" . $field] = $this->$field;
 		}
 
-		$sql = "INSERT INTO `".self::tablename()."` (`".implode("`,`", $fields)."`) VALUES (:".implode(",:", $fields).")";
+		$sql = "INSERT INTO `".static::tablename()."` (`".implode("`,`", $fields)."`) VALUES (:".implode(",:", $fields).")";
 		$q = $this->_fizz_pdo->prepare($sql);
 		return $this->_fizz_execute($q, $values);
 	}
@@ -95,7 +100,7 @@ abstract class Fizz
 		}
 
 		// Prepare the query
-		$sql = "UPDATE `".self::tablename()."` SET " . implode(",", $sets) . " WHERE " . implode(" AND ", $wheres);
+		$sql = "UPDATE `".static::tablename()."` SET " . implode(",", $sets) . " WHERE " . implode(" AND ", $wheres);
 
 		$q = $this->_fizz_pdo->prepare($sql);
 		$result = $this->_fizz_execute($q, $values);
@@ -115,7 +120,7 @@ abstract class Fizz
 	 */
 	public static function all() {
 		$pdo = FizzConfig::getDB();
-		$sql = "SELECT * FROM " . self::tablename();
+		$sql = "SELECT * FROM " . static::tablename();
 		$result = $pdo->query($sql);
 		return $result->fetchAll(\PDO::FETCH_CLASS, get_called_class());
 	}
@@ -135,7 +140,7 @@ abstract class Fizz
 		}
 
 		// Build the query
-		$sql = "SELECT * FROM " . self::tablename() . " WHERE " . implode(" AND ", $wheres);
+		$sql = "SELECT * FROM " . static::tablename() . " WHERE " . implode(" AND ", $wheres);
 
 		// Execute the statement
 		$q = $pdo->prepare($sql);
@@ -158,7 +163,7 @@ abstract class Fizz
 	 * Use with caution!
 	 */
 	public function truncate() {
-		$sql = "TRUNCATE `" . self::tablename() . "`";
+		$sql = "TRUNCATE `" . static::tablename() . "`";
 		$q = $this->_fizz_pdo->prepare($sql);
 		return $this->_fizz_execute($q, array());
 	}
