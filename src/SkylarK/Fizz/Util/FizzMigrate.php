@@ -188,11 +188,13 @@ class FizzMigrate
 	 * @param string $name The name of the field
 	 * @param string $type SQL Type
 	 * @param boolean $null Can this column be null? (Default: no)
+	 * @param array $extra Additional attributes (e.g. AUTO INCREMENT)
 	 */
-	public function addField($name, $type, $null = false) {
-		$field = new \SkylarK\Fizz\Structures\Field($name, $type, array(
-			$null ? "NULL" : "NOT NULL"
-		));
+	public function addField($name, $type, $null = false, $extra = array()) {
+		$attrs = $extra;
+		$attrs[] = $null ? "NULL" : "NOT NULL";
+
+		$field = new \SkylarK\Fizz\Structures\Field($name, $type, $attrs);
 
 		if ($this->_version > 0) {
 			$this->_operations[] = $field->getAddSQL($this->_table);
@@ -269,6 +271,36 @@ class FizzMigrate
 	public function retypeField($name, $type) {
 		$field = $this->_fields[$name];
 		$field->setType($type);
+
+		if ($this->_version > 0) {
+			$this->_operations[] = $field->getChangeSQL($this->_table);
+		}
+	}
+
+	/**
+	 * Add an attribute to a field
+	 * 
+	 * @param string $name The name of the field
+	 * @param string $attribute The attribute
+	 */
+	public function addAttribute($name, $attribute) {
+		$field = $this->_fields[$name];
+		$field->addAttribute($attribute);
+
+		if ($this->_version > 0) {
+			$this->_operations[] = $field->getChangeSQL($this->_table);
+		}
+	}
+
+	/**
+	 * Remove an attribute from a field
+	 * 
+	 * @param string $name The name of the field
+	 * @param string $attribute The attribute
+	 */
+	public function removeAttribute($name, $attribute) {
+		$field = $this->_fields[$name];
+		$field->removeAttribute($attribute);
 
 		if ($this->_version > 0) {
 			$this->_operations[] = $field->getChangeSQL($this->_table);
