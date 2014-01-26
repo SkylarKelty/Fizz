@@ -341,6 +341,15 @@ class FizzMigrate
 	}
 
 	/**
+	 * Remove a named index
+	 * 
+	 * @param string  $name  The name of the field. Can also an array of fields.
+	 */
+	public function removeIndex($name) {
+		$this->setIndex($name, false);
+	}
+
+	/**
 	 * Make a field Unique, or not
 	 * 
 	 * @param string  $name  The name of the field. Can also an array of fields.
@@ -355,6 +364,15 @@ class FizzMigrate
 			unset($this->_indexes[$name]);
 			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP UNIQUE `" . $name . "`";
 		}
+	}
+
+	/**
+	 * Remove a named unique
+	 * 
+	 * @param string  $name  The name of the field. Can also an array of fields.
+	 */
+	public function removeUnique($name) {
+		$this->setUnique($name, false);
 	}
 
 	/**
