@@ -308,77 +308,69 @@ class FizzMigrate
 	}
 
 	/**
+	 * Add a key
+	 */
+	private function setKey($type, $fields, $value = true) {
+		$arr_key = is_array($fields) ? join('', $fields) : $fields;
+
+		if ($value) {
+			$index = new \SkylarK\Fizz\Structures\Index($type, $fields);
+			$this->_indexes[$arr_key] = $index;
+			$this->_operations[] = $index->getAddSQL($this->_table);
+			return;
+		}
+
+		$index = $this->_indexes[$arr_key];
+		$this->_operations[] = $index->getDropSQL($this->_table);
+		unset($this->_indexes[$arr_key]);
+	}
+
+	/**
 	 * Turn a field into a primary key, or remove a primary key
 	 * 
-	 * @param string  $name  The name of the field
+	 * @param string  $field The name of the field
 	 * @param boolean $value True if this field should be a primary key, false if not
 	 */
-	public function setPrimary($name, $value = true) {
-		if ($value) {
-			$this->_indexes[$name] = "PRIMARY KEY";
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD PRIMARY KEY (  `" . $name . "` )";
-		} else {
-			unset($this->_indexes[$name]);
-			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP PRIMARY KEY";
-		}
+	public function setPrimary($field, $value = true) {
+		$this->setKey("PRIMARY KEY", $field, $value);
 	}
 
 	/**
 	 * Turn a field into an index, or remove an index
 	 * 
-	 * @param string  $name  The name of the field. Can also an array of fields.
+	 * @param string|array  $fields The name of the field. Can also an array of field names.
 	 * @param boolean $value True if this field should be an index, false if not
 	 */
-	public function setIndex($name, $value = true) {
-		$indexname = "index_" . (is_array($name) ? join('_', $name) : $name);
-		$name = is_array($name) ? join('`,`', $name) : $name;
-
-		if ($value) {
-			$this->_indexes[$name] = "INDEX";
-			$this->_operations[] = "ALTER TABLE `{$this->_table}` ADD INDEX {$indexname} (`{$name}`)";
-			return;
-		}
-
-		unset($this->_indexes[$name]);
-		$this->_operations[] = "ALTER TABLE `{$this->_table}` DROP INDEX `{$indexname}`";
+	public function setIndex($fields, $value = true) {
+		$this->setKey("INDEX", $fields, $value);
 	}
 
 	/**
 	 * Remove a named index
 	 * 
-	 * @param string  $name  The name of the field. Can also an array of fields.
+	 * @param string|array  $fields The name of the field. Can also an array of field names.
 	 */
-	public function removeIndex($name) {
-		$this->setIndex($name, false);
+	public function removeIndex($fields) {
+		$this->setIndex($fields, false);
 	}
 
 	/**
 	 * Make a field Unique, or not
 	 * 
-	 * @param string  $name  The name of the field. Can also an array of fields.
+	 * @param string|array  $fields The name of the field. Can also an array of field names.
 	 * @param boolean $value True if this field should be unique, false if not
 	 */
-	public function setUnique($name, $value = true) {
-		$indexname = "unique_" . (is_array($name) ? join('_', $name) : $name);
-		$name = is_array($name) ? join('`,`', $name) : $name;
-
-		if ($value) {
-			$this->_indexes[$name] = "UNIQUE KEY";
-			$this->_operations[] = "ALTER TABLE  `{$this->_table}` ADD UNIQUE {$indexname} (`{$name}`)";
-			return;
-		}
-
-		unset($this->_indexes[$name]);
-		$this->_operations[] = "ALTER TABLE `{$this->_table}` DROP UNIQUE `{$indexname}`";
+	public function setUnique($fields, $value = true) {
+		$this->setKey("UNIQUE KEY", $fields, $value);
 	}
 
 	/**
 	 * Remove a named unique
 	 * 
-	 * @param string  $name  The name of the field. Can also an array of fields.
+	 * @param string|array  $fields The name of the field. Can also an array of field names.
 	 */
-	public function removeUnique($name) {
-		$this->setUnique($name, false);
+	public function removeUnique($fields) {
+		$this->setUnique($fields, false);
 	}
 
 	/**
@@ -394,18 +386,8 @@ class FizzMigrate
 		}
 
 		// Build indexes into the fields
-		foreach ($this->_indexes as $name => $type) {
-			switch ($type) {
-				case "PRIMARY KEY":
-					$fields[] = "PRIMARY KEY (`{$name}`)";
-					break;
-				case "UNIQUE KEY":
-					$fields[] = "UNIQUE KEY `{$name}` (`{$name}`)";
-					break;
-				case "INDEX":
-					$fields[] = "KEY `{$name}` (`{$name}`)";
-					break;
-			}
+		foreach ($this->_indexes as $name => $obj) {
+			$fields[] = $obj->getCreateSQL();
 		}
 
 		$sql .= implode(",", $fields);
