@@ -18,7 +18,11 @@ class TestableFizzMigrate extends SkylarK\Fizz\Util\FizzMigrate
 
 class FizzMigrateTest extends PHPUnit_Framework_TestCase
 {
+	private $_introspector;
+
 	public function setUp() {
+		$this->_introspector = new SkylarK\Fizz\Util\Introspect();
+
 		// Although it seems horribly inefficient, it ensures each test is clean
 		// and fresh. It's for tests, so accuracy > efficiency
 		try {
@@ -31,6 +35,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 
 		// Drop each test's table
 		SkylarK\Fizz\Util\FizzOps::drop("Example");
+
 	}
 
 	public static function tearDownAfterClass() {
@@ -351,10 +356,27 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 	}
 
 	public function test_InitialPK() {
+		// This is somewhat redundant but meh.
 		$object = new TestableFizzMigrate("PKTest");
-		$object->addField("key", "int(11) AUTO_INCREMENT");
+		$object->addField("key", "int(11)", false, array("AUTO_INCREMENT"));
 		$object->addField("value", "varchar(125)");
 		$object->setPrimary("key");
 		$this->assertTrue($object->commit());
+	}
+
+	public function test_Attrs() {
+		$object = new TestableFizzMigrate("Example");
+		$object->addField("key", "int(11)", false, array("AUTO_INCREMENT"));
+		$object->addField("value", "varchar(125)");
+		$object->setPrimary("key");
+		$this->assertTrue($object->commit());
+		$object->removeAttribute("value", "NULL");
+		$object->addAttribute("value", "NOT NULL");
+		$this->assertTrue($object->commit());
+
+		// Check actual DB
+		$meta = $this->_introspector->getMeta("Example");
+		$this->assertEquals("auto_increment", $meta[0]['extra']);
+		$this->assertEquals("NO", $meta[1]['null']);
 	}
 }
