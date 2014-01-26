@@ -330,14 +330,17 @@ class FizzMigrate
 	 * @param boolean $value True if this field should be an index, false if not
 	 */
 	public function setIndex($name, $value = true) {
+		$indexname = "index_" . (is_array($name) ? join('_', $name) : $name);
 		$name = is_array($name) ? join('`,`', $name) : $name;
+
 		if ($value) {
 			$this->_indexes[$name] = "INDEX";
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD INDEX (`" . $name . "`)";
-		} else {
-			unset($this->_indexes[$name]);
-			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP INDEX `" . $name . "`";
+			$this->_operations[] = "ALTER TABLE `{$this->_table}` ADD INDEX {$indexname} (`{$name}`)";
+			return;
 		}
+
+		unset($this->_indexes[$name]);
+		$this->_operations[] = "ALTER TABLE `{$this->_table}` DROP INDEX `{$indexname}`";
 	}
 
 	/**
@@ -356,14 +359,17 @@ class FizzMigrate
 	 * @param boolean $value True if this field should be unique, false if not
 	 */
 	public function setUnique($name, $value = true) {
+		$indexname = "unique_" . (is_array($name) ? join('_', $name) : $name);
 		$name = is_array($name) ? join('`,`', $name) : $name;
+
 		if ($value) {
 			$this->_indexes[$name] = "UNIQUE KEY";
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD UNIQUE (`" . $name . "`)";
-		} else {
-			unset($this->_indexes[$name]);
-			$this->_operations[] = "ALTER TABLE `" . $this->_table . "` DROP UNIQUE `" . $name . "`";
+			$this->_operations[] = "ALTER TABLE  `{$this->_table}` ADD UNIQUE {$indexname} (`{$name}`)";
+			return;
 		}
+
+		unset($this->_indexes[$name]);
+		$this->_operations[] = "ALTER TABLE `{$this->_table}` DROP UNIQUE `{$indexname}`";
 	}
 
 	/**
