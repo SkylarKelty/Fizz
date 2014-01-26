@@ -107,7 +107,7 @@ class Field
 	 * Get the SQL to drop this field
 	 */
 	public function getDropSQL($table) {
-		return "ALTER TABLE `{$table}` DROP " . $this->getCreateSQL();
+		return "ALTER TABLE `{$table}` DROP `{$this->_name}`";
 	}
 
 	/**

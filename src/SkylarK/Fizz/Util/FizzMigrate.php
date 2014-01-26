@@ -190,7 +190,7 @@ class FizzMigrate
 	 * @param boolean $null Can this column be null? (Default: no)
 	 */
 	public function addField($name, $type, $null = false) {
-		$field = new Structures\Field($name, $type, array(
+		$field = new \SkylarK\Fizz\Structures\Field($name, $type, array(
 			$null ? "NULL" : "NOT NULL"
 		));
 
