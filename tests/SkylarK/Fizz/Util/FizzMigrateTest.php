@@ -357,7 +357,7 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 
 	public function test_InitialPK() {
 		// This is somewhat redundant but meh.
-		$object = new TestableFizzMigrate("PKTest");
+		$object = new TestableFizzMigrate("Example");
 		$object->addField("key", "int(11)", false, array("AUTO_INCREMENT"));
 		$object->addField("value", "varchar(125)");
 		$object->setPrimary("key");
@@ -378,5 +378,18 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$meta = $this->_introspector->getMeta("Example");
 		$this->assertEquals("auto_increment", $meta[0]['extra']);
 		$this->assertEquals("NO", $meta[1]['null']);
+	}
+
+	public function test_AggregateKeys() {
+		$object = new TestableFizzMigrate("Example");
+		$object->addField("key", "int(11)", false, array("AUTO_INCREMENT"));
+		$object->addField("value", "varchar(125)");
+		$object->addField("value2", "varchar(125)");
+		$object->addField("value3", "varchar(225)");
+		$object->setPrimary("key");
+		$object->setIndex(array("value", "value2"));
+		$this->assertTrue($object->commit());
+		$object->setIndex(array("value2", "value3"));
+		$this->assertTrue($object->commit());
 	}
 }

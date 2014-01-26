@@ -24,6 +24,19 @@ class FizzTest extends PHPUnit_Framework_TestCase
 			die($e->getMessage());
 			exit(0);
 		}
+
+		// Drop each test's table
+		SkylarK\Fizz\Util\FizzOps::drop("Demo");
+
+		// Create table
+		$object = new SkylarK\Fizz\Util\FizzMigrate("Demo");
+		$object->addField("key", "varchar(125)");
+		$object->addField("value", "text");
+		$this->assertTrue($object->commit());
+	}
+
+	public static function tearDownAfterClass() {
+		SkylarK\Fizz\Util\FizzOps::drop("Demo");
 	}
 
 	// -----------------------------------------------------------------------------------------
