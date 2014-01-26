@@ -385,8 +385,11 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$object->addField("key", "int(11)", false, array("AUTO_INCREMENT"));
 		$object->addField("value", "varchar(125)");
 		$object->addField("value2", "varchar(125)");
+		$object->addField("value3", "varchar(225)");
 		$object->setPrimary("key");
 		$object->setIndex(array("value", "value2"));
+		$this->assertTrue($object->commit());
+		$object->setIndex(array("value2", "value3"));
 		$this->assertTrue($object->commit());
 	}
 }
