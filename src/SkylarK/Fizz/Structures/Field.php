@@ -71,6 +71,23 @@ class Field
 	}
 
 	/**
+	 * Add an attribute to this field
+	 */
+	public function addAttribute($attribute) {
+		$this->_attrs[] = $attribute;
+	}
+
+	/**
+	 * Remove an attribute from this field
+	 */
+	public function removeAttribute($attribute) {
+		$key = array_search($attribute, $this->_attrs);
+		if ($key) {
+			unset($this->_attrs[$key]);
+		}
+	}
+
+	/**
 	 * Get the data of this field as an associative array
 	 */
 	public function getData() {

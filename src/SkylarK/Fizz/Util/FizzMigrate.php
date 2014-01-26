@@ -278,6 +278,36 @@ class FizzMigrate
 	}
 
 	/**
+	 * Add an attribute to a field
+	 * 
+	 * @param string $name The name of the field
+	 * @param string $attribute The attribute
+	 */
+	public function addAttribute($name, $attribute) {
+		$field = $this->_fields[$name];
+		$field->addAttribute($attribute);
+
+		if ($this->_version > 0) {
+			$this->_operations[] = $field->getChangeSQL($this->_table);
+		}
+	}
+
+	/**
+	 * Remove an attribute from a field
+	 * 
+	 * @param string $name The name of the field
+	 * @param string $attribute The attribute
+	 */
+	public function removeAttribute($name, $attribute) {
+		$field = $this->_fields[$name];
+		$field->removeAttribute($attribute);
+
+		if ($this->_version > 0) {
+			$this->_operations[] = $field->getChangeSQL($this->_table);
+		}
+	}
+
+	/**
 	 * Turn a field into a primary key, or remove a primary key
 	 * 
 	 * @param string  $name  The name of the field
