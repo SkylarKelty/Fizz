@@ -295,7 +295,7 @@ class FizzMigrate
 	/**
 	 * Remove an attribute from a field
 	 * 
-	 * @param string $name The name of the field
+	 * @param string $name The name of the field. Can also an array of fields.
 	 * @param string $attribute The attribute
 	 */
 	public function removeAttribute($name, $attribute) {
@@ -326,10 +326,11 @@ class FizzMigrate
 	/**
 	 * Turn a field into an index, or remove an index
 	 * 
-	 * @param string  $name  The name of the field
+	 * @param string  $name  The name of the field. Can also an array of fields.
 	 * @param boolean $value True if this field should be an index, false if not
 	 */
 	public function setIndex($name, $value = true) {
+		$name = is_array($name) ? join('`,`', $name) : $name;
 		if ($value) {
 			$this->_indexes[$name] = "INDEX";
 			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD INDEX (`" . $name . "`)";
@@ -342,10 +343,11 @@ class FizzMigrate
 	/**
 	 * Make a field Unique, or not
 	 * 
-	 * @param string  $name  The name of the field
+	 * @param string  $name  The name of the field. Can also an array of fields.
 	 * @param boolean $value True if this field should be unique, false if not
 	 */
 	public function setUnique($name, $value = true) {
+		$name = is_array($name) ? join('`,`', $name) : $name;
 		if ($value) {
 			$this->_indexes[$name] = "UNIQUE KEY";
 			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD UNIQUE (`" . $name . "`)";
