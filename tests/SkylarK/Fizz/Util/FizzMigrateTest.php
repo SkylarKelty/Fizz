@@ -379,4 +379,14 @@ class FizzMigrateTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals("auto_increment", $meta[0]['extra']);
 		$this->assertEquals("NO", $meta[1]['null']);
 	}
+
+	public function test_AggregateKeys() {
+		$object = new TestableFizzMigrate("Example");
+		$object->addField("key", "int(11)", false, array("AUTO_INCREMENT"));
+		$object->addField("value", "varchar(125)");
+		$object->addField("value2", "varchar(125)");
+		$object->setPrimary("key");
+		$object->setIndex(array("value", "value2"));
+		$this->assertTrue($object->commit());
+	}
 }
