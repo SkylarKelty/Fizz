@@ -190,10 +190,17 @@ class FizzMigrate
 	 * @param boolean $null Can this column be null? (Default: no)
 	 */
 	public function addField($name, $type, $null = false) {
-		$this->_fields[$name] = array("type" => $type, "null" => $null);
+		$field = new Structures\Field($name, $type, array(
+			$null ? "NULL" : "NOT NULL"
+		));
+
 		if ($this->_version > 0) {
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` ADD " . $this->_getFieldSQL($name, $this->_fields[$name]);
+			$this->_operations[] = $field->getAddSQL($this->_table);
 		}
+
+		$this->_fields[$name] = $field;
+
+		return $field;
 	}
 
 	/**
@@ -202,10 +209,13 @@ class FizzMigrate
 	 * @param string $name The name of the field
 	 */
 	public function removeField($name) {
-		unset($this->_fields[$name]);
+		$field = $this->_fields[$name];
+
 		if ($this->_version > 0) {
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` DROP `" . $name . "`";
+			$this->_operations[] = $field->getDropSQL($this->_table);
 		}
+
+		unset($this->_fields[$name]);
 	}
 
 	/**
@@ -215,11 +225,15 @@ class FizzMigrate
 	 * @param string $new_name The new name of the field
 	 */
 	public function renameField($name, $newName) {
-		$this->_fields[$newName] = $this->_fields[$name];
-		unset($this->_fields[$name]);
+		$field = $this->_fields[$name];
+		$field->setName($newName);
+
 		if ($this->_version > 0) {
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` CHANGE `" . $name . "` " . $this->_getFieldSQL($newName, $this->_fields[$newName]);
+			$this->_operations[] = $field->getRenameSQL($this->_table, $name);
 		}
+
+		unset($this->_fields[$name]);
+		$this->_fields[$newName] = $field;
 	}
 
 	/**
@@ -229,7 +243,8 @@ class FizzMigrate
 	 * @param integer $size The new size of the field
 	 */
 	public function resizeField($name, $size) {
-		$currentType = $this->_fields[$name]['type'];
+		$field = $this->_fields[$name];
+		$currentType = $field->getType();
 
 		// Work out the new type
 		if (strpos($currentType, "(")) {
@@ -238,11 +253,10 @@ class FizzMigrate
 			$newType = $currentType . "(" . $size . ")";
 		}
 		
-
-		$this->_fields[$name]['type'] = $newType;
+		$field->setType($newType);
 
 		if ($this->_version > 0) {
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` CHANGE `" . $name . "` " . $this->_getFieldSQL($name, $this->_fields[$name]);
+			$this->_operations[] = $field->getChangeSQL($this->_table);
 		}
 	}
 
@@ -253,10 +267,11 @@ class FizzMigrate
 	 * @param string $type The new type of the field
 	 */
 	public function retypeField($name, $type) {
-		$this->_fields[$name]['type'] = $type;
+		$field = $this->_fields[$name];
+		$field->setType($type);
 
 		if ($this->_version > 0) {
-			$this->_operations[] = "ALTER TABLE  `" . $this->_table . "` CHANGE `" . $name . "` " . $this->_getFieldSQL($name, $this->_fields[$name]);
+			$this->_operations[] = $field->getChangeSQL($this->_table);
 		}
 	}
 
@@ -316,8 +331,8 @@ class FizzMigrate
 
 		// Build fields
 		$fields = array();
-		foreach ($this->_fields as $name => $data) {
-			$fields[] = $this->_getFieldSQL($name, $data);
+		foreach ($this->_fields as $name => $field) {
+			$fields[] = $field->getCreateSQL();
 		}
 
 		// Build indexes into the fields
@@ -382,13 +397,6 @@ class FizzMigrate
 		}
 		$q->closeCursor();
 		return true;
-	}
-
-	/**
-	 * Returns SQL for a given field
-	 */
-	protected function _getFieldSQL($name, $data) {
-		return "`" . $name . "` " . $data['type'] . " " . ($data['null'] ? "DEFAULT NULL" : "NOT NULL");
 	}
 	
 	/**
