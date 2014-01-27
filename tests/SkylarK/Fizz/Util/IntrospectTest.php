@@ -40,4 +40,16 @@ class IntrospectTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals("int(11)", $result[0]["type"]);
 		$this->assertEquals("varchar(26)", $result[1]["type"]);
 	}
+
+	public function test_saveModels() {
+		$obj = new SkylarK\Fizz\Util\Introspect();
+		$foldername = "/tmp/FizzIntrospectorTest";
+
+		if (!file_exists($foldername)) {
+			mkdir($foldername);
+		}
+
+		$obj->saveModels($foldername);
+		$this->assertEquals(2, count(glob("$foldername/*.php")));
+	}
 }
