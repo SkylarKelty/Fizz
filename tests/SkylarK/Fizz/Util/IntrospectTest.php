@@ -50,6 +50,6 @@ class IntrospectTest extends PHPUnit_Framework_TestCase
 		}
 
 		$obj->saveModels($foldername);
-		$this->assertEquals(2, count(glob("$foldername/*.php")));
+		$this->assertEquals(1, count(glob("$foldername/*.php")));
 	}
 }
