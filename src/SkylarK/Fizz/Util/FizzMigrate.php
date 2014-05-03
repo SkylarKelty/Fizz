@@ -112,7 +112,7 @@ class FizzMigrate
 	}
 
 	/**
-	 * Commit chanegs to DB
+	 * Commit changes to DB
 	 */
 	public function commit() {
 		// Bail out if we have no fields
