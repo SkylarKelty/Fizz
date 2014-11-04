@@ -23,6 +23,11 @@ class FizzConfig
 	 * @param string $db_password A PDO connection password
 	 */
 	public static function setDB($db_dsn, $db_username = NULL, $db_password = NULL) {
+		if (is_object($db_dsn)) {
+			self::$_pdo = $db_dsn;
+			return;
+		}
+
 		self::$_pdo = new \PDO($db_dsn, $db_username, $db_password);
 	}
 
